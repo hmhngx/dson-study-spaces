@@ -3,7 +3,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const winston = require('winston');
 const { Client } = require('@googlemaps/google-maps-services-js');
-const helmet = require('helmet'); // Add this line to import helmet
+const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
@@ -30,7 +30,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Middleware
 app.use(express.json());
-app.use(helmet()); // This line should now work
+app.use(helmet());
 
 // Add root route for testing
 app.get('/', (req, res) => {
@@ -45,7 +45,7 @@ const setCORSHeaders = (req, res) => {
   const origin = req.headers.origin;
   const allowedOrigins = [
     'http://localhost:3000',
-    'https://front-end-chi-six.vercel.app/',
+    'https://front-end-chi-six.vercel.app', // Removed trailing slash
     undefined 
   ];
   if (allowedOrigins.includes(origin)) {
@@ -124,6 +124,7 @@ const loadData = async (userLat, userLng) => {
     let jsonData;
     try {
       jsonData = await fs.readFile(filePath, 'utf-8');
+      console.log('Successfully read data.json:', jsonData); // Add this line
     } catch (error) {
       if (error.code === 'ENOENT') {
         logger.error(`data.json not found at ${filePath}`);
@@ -137,6 +138,7 @@ const loadData = async (userLat, userLng) => {
     let buildings;
     try {
       buildings = JSON.parse(jsonData);
+      console.log('Parsed buildings:', buildings); // Add this line
     } catch (error) {
       logger.error(`Error parsing data.json: ${error.message}`);
       throw error;
@@ -181,10 +183,12 @@ const loadData = async (userLat, userLng) => {
     );
 
     buildings = buildings.filter(building => building !== null);
+    console.log('Processed buildings:', buildings); // Add this line
     console.log('Processed buildings:', buildings.length, 'entries');
 
     if (userLat && userLng) {
       buildings.sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+      console.log('Sorted buildings:', buildings); // Add this line
     }
 
     return Buffer.from(JSON.stringify(buildings)).toString('base64');
