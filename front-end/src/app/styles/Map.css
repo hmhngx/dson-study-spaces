@@ -1,0 +1,26 @@
+.neon-text-open {
+  text-shadow: 0 0 5px #4ade80, 0 0 10px #4ade80, 0 0 20px #4ade80, 0 0 40px #4ade80;
+}
+
+.neon-text-closed {
+  text-shadow: 0 0 5px #fb7185, 0 0 10px #fb7185, 0 0 20px #fb7185, 0 0 40px #fb7185;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite ease-in-out;
+}

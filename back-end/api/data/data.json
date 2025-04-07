@@ -1,0 +1,240 @@
+[
+  {
+    "name": "Waidner-Spahr Library",
+    "coords": [40.202722, -77.198047],
+    "address": "333 W High St, Carlisle, PA 17013",
+    "hours": {
+      "Monday": ["08:00", "23:59"],
+      "Tuesday": ["08:00", "23:59"],
+      "Wednesday": ["08:00", "23:59"],
+      "Thursday": ["08:00", "23:59"],
+      "Friday": ["08:00", "20:00"],
+      "Saturday": ["10:00", "20:00"],
+      "Sunday": ["12:00", "23:59"]
+    },
+    "station": "Carlisle",
+    "rating": 4.5,
+    "image": "/images/WaidnerLib.jpg"
+  },
+  {
+    "name": "Althouse Hall",
+    "coords": [40.203105, -77.195874],
+    "address": "45 N College St, Carlisle, PA 17013",
+    "hours": {
+      "Monday": ["07:00", "22:00"],
+      "Tuesday": ["07:00", "22:00"],
+      "Wednesday": ["07:00", "22:00"],
+      "Thursday": ["07:00", "22:00"],
+      "Friday": ["07:00", "22:00"],
+      "Saturday": ["07:00", "22:00"],
+      "Sunday": ["07:00", "22:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.2,
+    "image": "/images/althouse.jpg"
+  },
+  {
+    "name": "Rector Science Complex",
+    "coords": [40.204324, -77.196856],
+    "address": "301 W Louther St, Carlisle, PA 17013",
+    "hours": {
+      "Monday": ["06:00", "23:59"],
+      "Tuesday": ["06:00", "23:59"],
+      "Wednesday": ["06:00", "23:59"],
+      "Thursday": ["06:00", "23:59"],
+      "Friday": ["06:00", "23:59"],
+      "Saturday": ["06:00", "23:59"],
+      "Sunday": ["06:00", "23:59"]
+    },
+    "station": "Carlisle",
+    "rating": 4.0,
+    "image": "/images/Rector.jpg"
+  },
+  {
+    "name": "Kline Fitness Center",
+    "coords": [40.202996, -77.201298],
+    "address": "575 W High St, Carlisle, PA 17013",
+    "hours": {
+      "Monday": ["06:00", "22:30"],
+      "Tuesday": ["06:00", "22:30"],
+      "Wednesday": ["06:00", "22:30"],
+      "Thursday": ["06:00", "22:30"],
+      "Friday": ["06:00", "21:00"],
+      "Saturday": ["09:00", "19:00"],
+      "Sunday": ["12:00", "22:30"]
+    },
+    "station": "Carlisle",
+    "rating": 4.6,
+    "image": "/images/kline.jpg"
+  },
+  {
+    "name": "Bosler Hall",
+    "coords": [40.202487, -77.195784],
+    "address": "201 W High St, Carlisle, PA 17013",
+    "hours": {
+      "Monday": ["08:00", "22:00"],
+      "Tuesday": ["08:00", "22:00"],
+      "Wednesday": ["08:00", "22:00"],
+      "Thursday": ["08:00", "22:00"],
+      "Friday": ["08:00", "22:00"],
+      "Saturday": ["08:00", "22:00"],
+      "Sunday": ["08:00", "22:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.3,
+    "image": "/images/bosler.jpg"
+  },
+  {
+    "name": "Holland Union Building (HUB)",
+    "coords": [40.203082, -77.196859],
+    "address": "28 N College St, Carlisle, PA 17013",
+    "hours": {
+      "Monday": ["07:00", "23:00"],
+      "Tuesday": ["07:00", "23:00"],
+      "Wednesday": ["07:00", "23:00"],
+      "Thursday": ["07:00", "23:00"],
+      "Friday": ["07:00", "23:00"],
+      "Saturday": ["09:00", "23:00"],
+      "Sunday": ["09:00", "23:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.4,
+    "image": "/images/hub.jpg"
+  },
+  {
+    "name": "Denny Hall",
+    "coords": [40.202251, -77.193576],
+    "address": "199 W High St, Carlisle, PA 17013",
+    "hours": {
+      "Monday": ["08:00", "22:00"],
+      "Tuesday": ["08:00", "22:00"],
+      "Wednesday": ["08:00", "22:00"],
+      "Thursday": ["08:00", "22:00"],
+      "Friday": ["08:00", "22:00"],
+      "Saturday": ["08:00", "22:00"],
+      "Sunday": ["08:00", "22:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.1,
+    "image": "/images/denny.jpg"
+  },
+  {
+    "name": "East College",
+    "coords": [40.202906, -77.194193],
+    "address": "50 N West St, Carlisle, PA 17013",
+    "hours": {
+      "Monday": ["08:00", "22:00"],
+      "Tuesday": ["08:00", "22:00"],
+      "Wednesday": ["08:00", "22:00"],
+      "Thursday": ["08:00", "22:00"],
+      "Friday": ["08:00", "22:00"],
+      "Saturday": ["08:00", "22:00"],
+      "Sunday": ["08:00", "22:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.0,
+    "image": "/images/eastcollege.jpg"
+  },
+  {
+    "name": "Denim Coffee at the Quarry",
+    "coords": [40.20346292960079, -77.19610767246922],
+    "address": "51 N College St, Carlisle, PA 17013",
+    "hours": {
+      "Monday": ["08:00", "17:00"],
+      "Tuesday": ["08:00", "17:00"],
+      "Wednesday": ["08:00", "17:00"],
+      "Thursday": ["08:00", "17:00"],
+      "Friday": ["08:00", "17:00"],
+      "Saturday": ["08:00", "17:00"],
+      "Sunday": ["08:00", "17:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.7,
+    "image": "/images/denim.jpg"
+  },
+  {
+    "name": "Tome Hall",
+    "coords": [40.204169, -77.197541],
+    "address": "343 W Louther St, Carlisle, PA 17013",
+    "hours": {
+      "Monday": ["06:00", "23:59"],
+      "Tuesday": ["06:00", "23:59"],
+      "Wednesday": ["06:00", "23:59"],
+      "Thursday": ["06:00", "23:59"],
+      "Friday": ["06:00", "23:59"],
+      "Saturday": ["06:00", "23:59"],
+      "Sunday": ["06:00", "23:59"]
+    },
+    "station": "Carlisle",
+    "rating": 4.2,
+    "image": "/images/tome.jpg"
+  },
+  {
+    "name": "Anita Tuvin Schlechter Auditorium (ATS)",
+    "coords": [40.203230, -77.197823],
+    "address": "360 W Louther St, Carlisle, PA 17013",
+    "hours": {
+      "Monday": ["09:00", "21:00"],
+      "Tuesday": ["09:00", "21:00"],
+      "Wednesday": ["09:00", "21:00"],
+      "Thursday": ["09:00", "21:00"],
+      "Friday": ["09:00", "17:00"],
+      "Saturday": ["09:00", "17:00"],
+      "Sunday": ["09:00", "17:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.3,
+    "image": "/images/ats.jpg"
+  },
+  {
+    "name": "Kaufman Hall / Stafford Greenhouse",
+    "coords": [40.20495553977638, -77.20029002348566],
+    "address": "400 W North St, Carlisle, PA 17013",
+    "hours": {
+      "Monday": ["08:00", "22:00"],
+      "Tuesday": ["08:00", "22:00"],
+      "Wednesday": ["08:00", "22:00"],
+      "Thursday": ["08:00", "22:00"],
+      "Friday": ["08:00", "22:00"],
+      "Saturday": ["08:00", "22:00"],
+      "Sunday": ["08:00", "22:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.1,
+    "image": "/images/kaufmann.jpg"
+  },
+  {
+    "name": "Weiss Arts Center",
+    "coords": [40.201506, -77.195375],
+    "address": "240 W High St, Carlisle, PA 17013",
+    "hours": {
+      "Monday": ["08:00", "22:00"],
+      "Tuesday": ["08:00", "22:00"],
+      "Wednesday": ["08:00", "22:00"],
+      "Thursday": ["08:00", "22:00"],
+      "Friday": ["08:00", "22:00"],
+      "Saturday": ["08:00", "22:00"],
+      "Sunday": ["08:00", "22:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.4,
+    "image": "/images/weiss.jpg"
+  },
+  {
+    "name": "Stern Center for Global Education",
+    "address": "208 W Louther St, Carlisle, PA 17013",
+    "coords": [40.203309, -77.194562],
+    "hours": {
+        "Monday": ["08:00", "16:00"],
+        "Tuesday": ["08:00", "16:00"],
+        "Wednesday": ["08:00", "16:00"],
+        "Thursday": ["08:00", "16:00"],
+        "Friday": ["08:00", "16:00"],
+        "Saturday": ["08:00", "16:00"],
+        "Sunday": ["08:00", "16:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.5,
+    "image": "/images/Stern.jpg"
+}
+]
