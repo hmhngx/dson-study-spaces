@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002/api/buildings";
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || "7f9a3b2c1d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0";
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
 
 console.log("Base URL:", baseUrl);
 console.log("API Key:", API_KEY);
