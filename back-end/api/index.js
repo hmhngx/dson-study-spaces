@@ -29,6 +29,12 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Middleware
 app.use(express.json());
+app.use(helmet());
+
+// Add root route for testing
+app.get('/', (req, res) => {
+  res.json({ message: "Welcome to the Dickinson Study Spaces Backend" });
+});
 
 // Router
 const router = express.Router();
@@ -38,7 +44,7 @@ const setCORSHeaders = (req, res) => {
   const origin = req.headers.origin;
   const allowedOrigins = [
     'http://localhost:3000',
-    'https://dickinson-study-spaces-front-end.vercel.app',
+    'https://dson-study-spaces-frontend.vercel.app',
     undefined 
   ];
   if (allowedOrigins.includes(origin)) {
@@ -204,9 +210,6 @@ app.use('/api/buildings', (req, res, next) => {
   }
   next();
 }, router);
-
-const helmet = require('helmet');
-app.use(helmet());
 
 // Start Server
 app.listen(port, () => {
