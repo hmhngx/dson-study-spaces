@@ -6,16 +6,20 @@
     "start": "node api/index.js",
     "dev": "nodemon api/index.js"
   },
-  "keywords": ["dickinson", "study-spaces", "api"],
+  "keywords": [
+    "dickinson",
+    "study-spaces",
+    "api"
+  ],
   "author": "Harrison Nguyen",
   "license": "ISC",
   "description": "Back-end API for Dickinson Study Spaces application",
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.3.43",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "winston": "^3.15.0",
-    "@googlemaps/google-maps-services-js": "^3.3.43",
-    "helmet": "^8.0.0"
+    "helmet": "^8.1.0",
+    "winston": "^3.15.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.7"

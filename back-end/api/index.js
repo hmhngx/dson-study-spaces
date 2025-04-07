@@ -3,6 +3,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const winston = require('winston');
 const { Client } = require('@googlemaps/google-maps-services-js');
+const helmet = require('helmet'); // Add this line to import helmet
 require('dotenv').config();
 
 const app = express();
@@ -29,7 +30,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Middleware
 app.use(express.json());
-app.use(helmet());
+app.use(helmet()); // This line should now work
 
 // Add root route for testing
 app.get('/', (req, res) => {
@@ -128,10 +129,18 @@ const loadData = async (userLat, userLng) => {
         logger.error(`data.json not found at ${filePath}`);
         return Buffer.from(JSON.stringify([])).toString('base64');
       }
+      logger.error(`Error reading data.json: ${error.message}`);
       throw error;
     }
+
     console.log('Parsing data.json');
-    let buildings = JSON.parse(jsonData);
+    let buildings;
+    try {
+      buildings = JSON.parse(jsonData);
+    } catch (error) {
+      logger.error(`Error parsing data.json: ${error.message}`);
+      throw error;
+    }
     console.log('Parsed buildings:', buildings.length, 'entries');
     const current = new Date();
 
@@ -180,7 +189,7 @@ const loadData = async (userLat, userLng) => {
 
     return Buffer.from(JSON.stringify(buildings)).toString('base64');
   } catch (error) {
-    logger.error(`Error loading data: ${error.message}`);
+    logger.error(`Error in loadData: ${error.message}`);
     throw error;
   }
 };
