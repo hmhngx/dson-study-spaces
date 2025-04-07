@@ -45,7 +45,7 @@ const setCORSHeaders = (req, res) => {
   const origin = req.headers.origin;
   const allowedOrigins = [
     'http://localhost:3000',
-    'https://front-ai52oqdor-harrison-nguyens-projects.vercel.app/home',
+    'https://front-end-chi-six.vercel.app/',
     undefined 
   ];
   if (allowedOrigins.includes(origin)) {
