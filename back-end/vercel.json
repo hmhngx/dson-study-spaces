@@ -8,10 +8,14 @@
   ],
   "routes": [
     {
+      "src": "/",
+      "dest": "api/index.js"
+    },
+    {
       "src": "/api/buildings",
       "dest": "api/index.js",
       "headers": {
-        "Access-Control-Allow-Origin": "https://dickinson-study-spaces-front-end.vercel.app",
+        "Access-Control-Allow-Origin": "https://dson-study-spaces-frontend.vercel.app",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Access-Control-Allow-Credentials": "true"
