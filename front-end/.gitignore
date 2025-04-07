@@ -44,3 +44,4 @@ next-env.d.ts
 /images
 
 back-end/api/data/data.json
+.vercel
