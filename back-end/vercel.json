@@ -15,7 +15,7 @@
       "src": "/api/buildings",
       "dest": "api/index.js",
       "headers": {
-        "Access-Control-Allow-Origin": "https://front-5659s9ouq-harrison-nguyens-projects.vercel.app",
+        "Access-Control-Allow-Origin": "https://front-46x81sf95-harrison-nguyens-projects.vercel.app",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Access-Control-Allow-Credentials": "true"
