@@ -2,6 +2,8 @@
 
 A full-stack web application to help Dickinson College students find and explore study spaces on campus, with interactive maps and building details.
 
+> **ℹ️ Note:** When using the website, please allow location permissions in your browser for the best experience. This enables features like sorting study spaces by distance from your current location.
+
 ## 🚀 Features
 - 🗺️ Interactive map with study space locations using Mapbox
 - 📍 View building details, including addresses, hours, and status
