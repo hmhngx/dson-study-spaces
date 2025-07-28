@@ -45,3 +45,5 @@ next-env.d.ts
 
 back-end/api/data/data.json
 .vercel
+vercel.json
+.next/
