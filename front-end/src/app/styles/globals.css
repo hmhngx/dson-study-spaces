@@ -62,12 +62,12 @@
     border: 1px solid hsl(var(--border));
   }
 
-  .font-grotesk {
-    font-family: 'Space Grotesk', sans-serif;
+  .font-heading {
+    font-family: var(--font-poppins), 'Poppins', sans-serif;
   }
 
   .font-body {
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), 'Inter', sans-serif;
   }
 }
 
@@ -81,7 +81,7 @@
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
-    font-family: 'Space Grotesk', sans-serif; 
+    font-family: var(--font-poppins), 'Poppins', sans-serif; 
     font-weight: 600;
     letter-spacing: -0.015em;
   }
@@ -97,14 +97,14 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), 'Inter', sans-serif;
     font-weight: 400;
     letter-spacing: -0.01em;
     line-height: 1.55;
   }
 
   h1, h2, h3, h4 {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: var(--font-poppins), 'Poppins', sans-serif;
     font-weight: 600;
     letter-spacing: -0.02em;
   }
@@ -113,6 +113,27 @@
 @layer utilities {
   .shadow-text {
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+  }
+
+  /* Glowing star effect */
+  .star-glow {
+    filter: drop-shadow(0 0 8px rgba(252, 211, 77, 0.8)) 
+            drop-shadow(0 0 16px rgba(252, 211, 77, 0.4))
+            drop-shadow(0 0 24px rgba(252, 211, 77, 0.2));
+    animation: star-pulse 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes star-pulse {
+    0% {
+      filter: drop-shadow(0 0 8px rgba(252, 211, 77, 0.8)) 
+              drop-shadow(0 0 16px rgba(252, 211, 77, 0.4))
+              drop-shadow(0 0 24px rgba(252, 211, 77, 0.2));
+    }
+    100% {
+      filter: drop-shadow(0 0 12px rgba(252, 211, 77, 1)) 
+              drop-shadow(0 0 20px rgba(252, 211, 77, 0.6))
+              drop-shadow(0 0 28px rgba(252, 211, 77, 0.3));
+    }
   }
 }
 

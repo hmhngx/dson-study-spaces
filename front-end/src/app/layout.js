@@ -1,11 +1,5 @@
-import { Urbanist } from "next/font/google";
+import { FONT_CONFIG, getFontVariables, getFontClasses } from "@/lib/fonts";
 import "./styles/globals.css";
-
-const urbanist = Urbanist({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-urbanist",
-});
 
 export const metadata = {
   title: "Dson Study Spaces",
@@ -19,7 +13,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${urbanist.variable} font-urbanist`}>{children}</body>
+      <body className={`${getFontVariables()} ${getFontClasses()}`}>{children}</body>
     </html>
   );
 }
