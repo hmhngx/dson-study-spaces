@@ -28,8 +28,9 @@ module.exports = {
         ring: "rgba(59, 130, 246, 0.5)",
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'], 
-        grotesk: ['Space Grotesk', 'sans-serif'], 
+        sans: ['var(--font-inter)', 'Inter', 'sans-serif'],
+        heading: ['var(--font-poppins)', 'Poppins', 'sans-serif'],
+        body: ['var(--font-inter)', 'Inter', 'sans-serif'],
       },
     },
   },
