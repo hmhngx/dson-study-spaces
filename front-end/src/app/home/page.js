@@ -11,6 +11,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  SortDropdownItem,
+  FilterDropdownItem,
 } from "@/ui/dropdown-menu";
 import { ScrollArea } from "@/ui/scroll-area";
 import Map from "../components/Map";
@@ -153,12 +155,12 @@ export default function Home() {
       </div>
       <div className="
         absolute bottom-0 left-0 h-full w-full sm:w-1/3 lg:w-1/4 
-        bg-card/20 backdrop-blur-lg z-10 
+        bg-gray-900/60 backdrop-blur-lg z-10 
         flex flex-col shadow-xl border-r border-border/30
       ">
-        <div className="w-full py-6 px-6 flex flex-col gap-4">
+        <div className="w-full py-8 px-6 flex flex-col gap-6">
           <Logo />
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <Button
               variant="ghost"
               className="
@@ -193,7 +195,7 @@ export default function Home() {
             </Button>
           </div>
           <AnimatedDateTime />
-          <div className="flex gap-3">
+          <div className="flex gap-4">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -204,6 +206,7 @@ export default function Home() {
                     transition-all duration-300 border-none
                     font-semibold
                     hover:shadow-xl focus:ring-2 focus:ring-secondary/50 focus:outline-none
+                    min-w-[140px] justify-between
                   "
                 >
                   <ArrowDown size="14px" className="mr-2" /> {sortOption}
@@ -212,39 +215,35 @@ export default function Home() {
               <DropdownMenuContent
                 align="start"
                 className="
-                  bg-card/20 backdrop-blur-md text-foreground 
-                  border-none shadow-lg rounded-xl
+                  bg-popover text-popover-foreground 
+                  border shadow-xl rounded-xl
                   p-2
                 "
               >
-                <DropdownMenuLabel className="font-bold">Sort By:</DropdownMenuLabel>
+                <DropdownMenuLabel className="font-bold text-foreground">Sort By:</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
+                <SortDropdownItem
+                  sortType="Closest"
+                  isActive={sortOption === "Closest"}
                   onClick={() => setSortOption("Closest")}
                   disabled={!coordinates}
-                  className="font-medium hover:bg-secondary/30 rounded-lg focus:bg-secondary/30 focus:outline-none"
-                >
-                  Closest
-                </DropdownMenuItem>
-                <DropdownMenuItem
+                />
+                <SortDropdownItem
+                  sortType="Furthest"
+                  isActive={sortOption === "Furthest"}
                   onClick={() => setSortOption("Furthest")}
                   disabled={!coordinates}
-                  className="font-medium hover:bg-secondary/30 rounded-lg focus:bg-secondary/30 focus:outline-none"
-                >
-                  Furthest
-                </DropdownMenuItem>
-                <DropdownMenuItem
+                />
+                <SortDropdownItem
+                  sortType="Highest Rated"
+                  isActive={sortOption === "Highest Rated"}
                   onClick={() => setSortOption("Highest Rated")}
-                  className="font-medium hover:bg-secondary/30 rounded-lg focus:bg-secondary/30 focus:outline-none"
-                >
-                  Highest Rated
-                </DropdownMenuItem>
-                <DropdownMenuItem
+                />
+                <SortDropdownItem
+                  sortType="Name"
+                  isActive={sortOption === "Name"}
                   onClick={() => setSortOption("Name")}
-                  className="font-medium hover:bg-secondary/30 rounded-lg focus:bg-secondary/30 focus:outline-none"
-                >
-                  Name
-                </DropdownMenuItem>
+                />
               </DropdownMenuContent>
             </DropdownMenu>
             <DropdownMenu>
@@ -257,6 +256,7 @@ export default function Home() {
                     transition-all duration-300 border-none
                     font-semibold
                     hover:shadow-xl focus:ring-2 focus:ring-secondary/50 focus:outline-none
+                    min-w-[140px] justify-between
                   "
                 >
                   <ListFilter size="14px" className="mr-2" /> {filterOption}
@@ -265,37 +265,34 @@ export default function Home() {
               <DropdownMenuContent
                 align="start"
                 className="
-                  bg-card/20 backdrop-blur-md text-foreground 
-                  border-none shadow-lg rounded-xl
+                  bg-popover text-popover-foreground 
+                  border shadow-xl rounded-xl
                   p-2
                 "
               >
-                <DropdownMenuLabel className="font-bold">Filter By:</DropdownMenuLabel>
+                <DropdownMenuLabel className="font-bold text-foreground">Filter By:</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
+                <FilterDropdownItem
+                  filterType="All"
+                  isActive={filterOption === "All"}
                   onClick={() => setFilterOption("All")}
-                  className="font-medium hover:bg-secondary/30 rounded-lg focus:bg-secondary/30 focus:outline-none"
-                >
-                  All
-                </DropdownMenuItem>
-                <DropdownMenuItem
+                />
+                <FilterDropdownItem
+                  filterType="Open"
+                  isActive={filterOption === "Open"}
                   onClick={() => setFilterOption("Open")}
-                  className="font-medium hover:bg-secondary/30 rounded-lg focus:bg-secondary/30 focus:outline-none"
-                >
-                  Open
-                </DropdownMenuItem>
-                <DropdownMenuItem
+                />
+                <FilterDropdownItem
+                  filterType="Closed"
+                  isActive={filterOption === "Closed"}
                   onClick={() => setFilterOption("Closed")}
-                  className="font-medium hover:bg-secondary/30 rounded-lg focus:bg-secondary/30 focus:outline-none"
-                >
-                  Closed
-                </DropdownMenuItem>
+                />
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </div>
         <ScrollArea className="flex-grow overflow-y-auto">
-          <div className="p-6 space-y-4">
+          <div className="p-6 space-y-6">
             {displayedBuildings.length > 0 ? (
               displayedBuildings.map((building) => (
                 <LazyBuildingCard

@@ -28,22 +28,22 @@ const BuildingCard = ({ building, day, coordinates, onClick, onError }) => {
   return (
     <div
       className={`
-        flex flex-col gap-3 p-4 rounded-xl mr-4 
-        backdrop-blur-md bg-opacity-20 bg-card 
+        flex flex-col gap-3 p-4 rounded-2xl mr-4 
+        backdrop-blur-lg bg-gray-800/40 dark:bg-gray-900/50
         shadow-xl hover:shadow-2xl 
         transition-all duration-300 
-        cursor-pointer border-none 
-        hover:bg-opacity-30 
+        cursor-pointer border border-white/20 dark:border-white/15
+        hover:bg-gray-800/50 dark:hover:bg-gray-900/60 hover:border-white/30 dark:hover:border-white/25
         transform hover:-translate-y-1`
       }
       onClick={onClick}
       id={convertToIdFormat(name)}
       tabIndex={0}
     >
-      <div className="h-[150px] relative rounded-lg overflow-hidden shadow-md">
+      <div className="h-[150px] relative rounded-xl overflow-hidden shadow-lg">
         {imageError ? (
-          <div className="h-full w-full flex items-center justify-center bg-gray-200 rounded-lg">
-            <p className="text-sm text-gray-500">Image not available</p>
+          <div className="h-full w-full flex items-center justify-center bg-gray-700/30 dark:bg-gray-800/40 backdrop-blur-sm rounded-xl border border-white/20 dark:border-white/15">
+            <p className="text-sm text-gray-200 dark:text-gray-200">Image not available</p>
           </div>
         ) : (
           <Image
@@ -52,7 +52,7 @@ const BuildingCard = ({ building, day, coordinates, onClick, onError }) => {
             fill={true}
             quality={75}
             style={{ objectFit: "cover" }}
-            className="rounded-lg transition-transform duration-300 hover:scale-105"
+            className="rounded-xl transition-transform duration-300 hover:scale-105"
             onError={(e) => {
               console.error(`Failed to load image for ${name}: ${imageSrc}`);
               setImageSrc("https://via.placeholder.com/150");
@@ -63,23 +63,23 @@ const BuildingCard = ({ building, day, coordinates, onClick, onError }) => {
         )}
       </div>
 
-      <div className="flex justify-between items-center mt-2">
-        <h2 className="font-bold text-xl tracking-tight">{name || "Unknown Building"}</h2>
-        <div className="inline-flex gap-1 items-center text-sm font-medium">
-          <Star size="14px" fill="#F3C623" strokeWidth={0} />
-          <span>{rating != null ? rating.toFixed(1) : "N/A"}</span>
+              <div className="flex justify-between items-center mt-2">
+          <h2 className="font-bold text-xl tracking-tight text-white">{name || "Unknown Building"}</h2>
+          <div className="inline-flex gap-1 items-center text-sm font-medium">
+            <Star size="14px" fill="#FCD34D" strokeWidth={0} className="star-glow" />
+            <span className="text-white">{rating != null ? rating.toFixed(1) : "N/A"}</span>
+          </div>
         </div>
-      </div>
 
       <div className="text-sm inline-flex gap-2 items-center mt-1">
-        <Clock size="14px" strokeWidth={2} />
+        <Clock size="14px" strokeWidth={2} className="text-gray-300" />
         <div className="inline-flex gap-1 items-center">
           {status === "Open" ? (
-            <p className="text-emerald-400 font-semibold neon-text-open">
+            <p className="text-emerald-400 font-semibold">
               Open{todayHours[1] && todayHours[1] !== "00:00" ? ` until ${formatTime(todayHours[1])}` : ""}
             </p>
           ) : (
-            <p className="text-rose-400 font-semibold neon-text-closed">
+            <p className="text-red-400 font-semibold">
               Closed{todayHours.length > 0 ? "" : " today"}
             </p>
           )}
@@ -87,14 +87,14 @@ const BuildingCard = ({ building, day, coordinates, onClick, onError }) => {
       </div>
 
       <div className="text-sm font-medium inline-flex gap-2 items-center mt-1">
-        <Train size="14px" strokeWidth={2} />
-        {station || "N/A"} Station
+        <Train size="14px" strokeWidth={2} className="text-gray-300" />
+        <span className="text-gray-200">{station || "N/A"} Station</span>
       </div>
 
       <div className="inline-flex gap-2 items-center justify-between mt-2">
-        <p className="text-base font-semibold">
+        <p className="text-base font-semibold text-white">
           {coordinates && distance != null ? distance.toFixed(2) : "-"} km{" "}
-          <span className="font-light text-sm">away</span>
+          <span className="font-light text-sm text-gray-300">away</span>
         </p>
 
         <Popover>
@@ -102,9 +102,10 @@ const BuildingCard = ({ building, day, coordinates, onClick, onError }) => {
             <Button
               className="
                 inline-flex gap-1 text-sm 
-                bg-primary/20 hover:bg-primary/40 
-                transition-all duration-300 border-none 
-                rounded-lg shadow-sm hover:shadow-md
+                bg-gray-700/40 hover:bg-gray-700/50 
+                transition-all duration-300 border border-white/30 
+                rounded-xl shadow-lg hover:shadow-xl
+                backdrop-blur-sm text-white
               "
               variant="ghost"
               onClick={(e) => e.stopPropagation()}
@@ -115,8 +116,8 @@ const BuildingCard = ({ building, day, coordinates, onClick, onError }) => {
           <PopoverContent
             align="end"
             className="
-              bg-card/20 backdrop-blur-md text-foreground 
-              border-none shadow-lg rounded-xl
+              bg-gray-800/40 dark:bg-gray-900/50 backdrop-blur-lg text-white 
+              border border-white/20 dark:border-white/15 shadow-xl rounded-2xl
               p-4
             "
           >
