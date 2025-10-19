@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "cd front-end && npm run dev",
+    "build": "cd front-end && npm run build",
+    "start": "cd front-end && npm run start",
+    "lint": "cd front-end && npm run lint"
   },
   "dependencies": {
     "@radix-ui/react-scroll-area": "^1.2.3",
