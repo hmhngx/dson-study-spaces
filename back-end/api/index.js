@@ -46,8 +46,6 @@ const setCORSHeaders = (req, res) => {
   const allowedOrigins = [
     'http://localhost:3000',
     'https://dson-study-spaces.vercel.app',
-    'https://dson-study-spaces-ce92g2jpx-harrison-nguyens-projects.vercel.app',
-    'https://dson-study-spaces-9b382yx45-harrison-nguyens-projects.vercel.app',
     undefined 
   ];
   
