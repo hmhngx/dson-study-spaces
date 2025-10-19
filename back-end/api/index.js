@@ -47,6 +47,7 @@ const setCORSHeaders = (req, res) => {
     'http://localhost:3000',
     'https://dson-study-spaces.vercel.app',
     'https://dson-study-spaces-ce92g2jpx-harrison-nguyens-projects.vercel.app',
+    'https://dson-study-spaces-9b382yx45-harrison-nguyens-projects.vercel.app',
     undefined 
   ];
   
@@ -221,9 +222,16 @@ router.get('/', async (req, res) => {
 
 app.use('/api/buildings', (req, res, next) => {
   const authHeader = req.headers.authorization;
+  const expectedAuth = `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`;
+  
   console.log('Received Authorization Header:', authHeader);
-  if (!authHeader || authHeader !== `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`) {
+  console.log('Expected Authorization Header:', expectedAuth);
+  console.log('NEXT_PUBLIC_API_KEY:', process.env.NEXT_PUBLIC_API_KEY);
+  console.log('Headers match:', authHeader === expectedAuth);
+  
+  if (!authHeader || authHeader !== expectedAuth) {
     logger.warn('Unauthorized access attempt');
+    console.log('Auth failed - Header:', authHeader, 'Expected:', expectedAuth);
     setCORSHeaders(req, res);
     return res.status(401).json({ error: 'Unauthorized' });
   }
