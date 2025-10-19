@@ -49,7 +49,12 @@ const setCORSHeaders = (req, res) => {
     'https://dson-study-spaces-ce92g2jpx-harrison-nguyens-projects.vercel.app',
     undefined 
   ];
-  if (allowedOrigins.includes(origin)) {
+  
+  // Check if origin is allowed or matches Vercel pattern
+  const isAllowed = allowedOrigins.includes(origin) || 
+                   (origin && origin.startsWith('https://dson-study-spaces-') && origin.endsWith('.vercel.app'));
+  
+  if (isAllowed) {
     res.setHeader('Access-Control-Allow-Origin', origin || '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
