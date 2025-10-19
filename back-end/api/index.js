@@ -216,7 +216,7 @@ router.get('/', async (req, res) => {
 app.use('/api/buildings', (req, res, next) => {
   const authHeader = req.headers.authorization;
   console.log('Received Authorization Header:', authHeader);
-  if (!authHeader || authHeader !== `Bearer ${process.env.API_KEY}`) {
+  if (!authHeader || authHeader !== `Bearer ${process.env.NEXT_PUBLIC_API_KEY}`) {
     logger.warn('Unauthorized access attempt');
     setCORSHeaders(req, res);
     return res.status(401).json({ error: 'Unauthorized' });
@@ -227,5 +227,5 @@ app.use('/api/buildings', (req, res, next) => {
 // Start Server
 app.listen(port, () => {
   logger.info(`Server running on port ${port}`);
-  console.log('API_KEY:', process.env.API_KEY);
+  console.log('NEXT_PUBLIC_API_KEY:', process.env.NEXT_PUBLIC_API_KEY);
 });
