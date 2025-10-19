@@ -11,6 +11,7 @@ A full-stack web application to help Dickinson College students find and explore
 - 🎨 Modern design system with Material 3 principles
 - 🎭 Glassmorphic UI components for content presentation
 - 🔧 Enhanced dropdown system with icons and animations
+- 💡 Interactive tooltips for enhanced user experience
 - 📝 Google Fonts integration (Inter & Poppins)
 - 📱 Responsive and user-friendly interface
 
@@ -20,6 +21,7 @@ A full-stack web application to help Dickinson College students find and explore
 - **Mapping**: Mapbox, Google Maps API (for geocoding)
 - **Design System**: Custom UI components with Material 3 design
 - **Typography**: Google Fonts (Inter, Poppins)
+- **UI Components**: Radix UI primitives with custom styling
 - **Deployment**: Vercel
 
 ## 🎨 Design System
@@ -33,6 +35,7 @@ A full-stack web application to help Dickinson College students find and explore
 - **Utility Components**: Solid backgrounds for maximum readability and accessibility
 - **Content Components**: Glassmorphic cards for modern, polished visual appeal
 - **Typography**: Inter for body text, Poppins for headings and UI elements
+- **Tooltips**: Interactive tooltips with glassmorphic styling for enhanced UX
 - **Animations**: Smooth 150ms transitions with hover micro-interactions
 
 ## 📦 Installation
@@ -129,6 +132,8 @@ Contributions are welcome! Please follow these steps:
 - ✨ Added comprehensive design system with Material 3 principles
 - 🎭 Implemented glassmorphic UI components for content presentation
 - 🔧 Enhanced dropdown system with icons and smooth animations
+- 💡 Integrated interactive tooltips across all components
 - 📝 Integrated Google Fonts (Inter & Poppins) with flexible configuration
 - 🎨 Updated component styling with modern design patterns
 - 📱 Improved responsive design and accessibility
+- 🛠️ Added Radix UI tooltip primitives with custom glassmorphic styling
