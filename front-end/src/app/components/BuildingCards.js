@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { formatTime } from "../../../services/formatTime";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/ui/tooltip";
 import { ChevronDown, Clock, Star, Train } from "lucide-react";
 import { Button } from "@/ui/button";
 import Image from "next/image";
@@ -97,22 +98,30 @@ const BuildingCard = ({ building, day, coordinates, onClick, onError }) => {
           <span className="font-light text-sm text-gray-300">away</span>
         </p>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              className="
-                inline-flex gap-1 text-sm 
-                bg-gray-700/40 hover:bg-gray-700/50 
-                transition-all duration-300 border border-white/30 
-                rounded-xl shadow-lg hover:shadow-xl
-                backdrop-blur-sm text-white
-              "
-              variant="ghost"
-              onClick={(e) => e.stopPropagation()}
-            >
-              View Hours <ChevronDown size="14px" />
-            </Button>
-          </PopoverTrigger>
+        <TooltipProvider>
+          <Popover>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <PopoverTrigger asChild>
+                  <Button
+                    className="
+                      inline-flex gap-1 text-sm 
+                      bg-gray-700/40 hover:bg-gray-700/50 
+                      transition-all duration-300 border border-white/30 
+                      rounded-xl shadow-lg hover:shadow-xl
+                      backdrop-blur-sm text-white
+                    "
+                    variant="ghost"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    View Hours <ChevronDown size="14px" />
+                  </Button>
+                </PopoverTrigger>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>View building hours for all days</p>
+              </TooltipContent>
+            </Tooltip>
           <PopoverContent
             align="end"
             className="
@@ -141,7 +150,8 @@ const BuildingCard = ({ building, day, coordinates, onClick, onError }) => {
               )}
             </ul>
           </PopoverContent>
-        </Popover>
+          </Popover>
+        </TooltipProvider>
       </div>
     </div>
   );

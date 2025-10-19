@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { fetchAndSortBuildings } from "../../../services/distance";
-import { ArrowDown, ListFilter, Github, Linkedin } from "lucide-react";
+import { ArrowDown, ListFilter, Github, Linkedin, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/ui/tooltip";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +36,7 @@ export default function Home() {
   const [displayedBuildings, setDisplayedBuildings] = useState([]);
   const [selectedCoordinates, setSelectedCoordinates] = useState(null);
   const [error, setError] = useState(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     console.log(`Sorting buildings with option: ${sortOption}`);
@@ -153,65 +155,133 @@ export default function Home() {
           selectedCoordinates={selectedCoordinates}
         />
       </div>
-      <div className="
-        absolute bottom-0 left-0 h-full w-full sm:w-1/3 lg:w-1/4 
-        bg-gray-900/60 backdrop-blur-lg z-10 
+      <div className={`
+        absolute bottom-0 left-0 h-full z-10 
+        bg-gray-900/60 backdrop-blur-lg 
         flex flex-col shadow-xl border-r border-border/30
-      ">
-        <div className="w-full py-8 px-6 flex flex-col gap-6">
-          <Logo />
-          <div className="flex gap-4">
-            <Button
-              variant="ghost"
-              className="
-                bg-secondary/80 text-foreground hover:bg-secondary/60 
-                backdrop-blur-md shadow-lg rounded-xl 
-                transition-all duration-300 border-none
-                font-semibold
-                hover:shadow-xl focus:ring-2 focus:ring-secondary/50 focus:outline-none
-              "
-              as="a"
-              href="https://github.com/hmhngx"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Github size="14px" className="mr-2" /> GitHub
-            </Button>
-            <Button
-              variant="ghost"
-              className="
-                bg-secondary/80 text-foreground hover:bg-secondary/60 
-                backdrop-blur-md shadow-lg rounded-xl 
-                transition-all duration-300 border-none
-                font-semibold
-                hover:shadow-xl focus:ring-2 focus:ring-secondary/50 focus:outline-none
-              "
-              as="a"
-              href="https://www.linkedin.com/in/hmh-nguyen/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Linkedin size="14px" className="mr-2" /> LinkedIn
-            </Button>
-          </div>
-          <AnimatedDateTime />
-          <div className="flex gap-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+        transition-all duration-300 ease-in-out
+        ${sidebarCollapsed 
+          ? 'w-16 sm:w-16 lg:w-16' 
+          : 'w-full sm:w-1/3 lg:w-1/4'
+        }
+      `}>
+        {/* Toggle Button */}
+        <div className="absolute top-4 right-4 z-20">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
                 <Button
-                  variant="outline"
+                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                  variant="ghost"
+                  size="sm"
                   className="
                     bg-secondary/80 text-foreground hover:bg-secondary/60 
-                    backdrop-blur-md shadow-lg rounded-xl 
+                    backdrop-blur-md shadow-lg rounded-full 
                     transition-all duration-300 border-none
-                    font-semibold
                     hover:shadow-xl focus:ring-2 focus:ring-secondary/50 focus:outline-none
-                    min-w-[140px] justify-between
+                    w-8 h-8 p-0
                   "
+                  aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                 >
-                  <ArrowDown size="14px" className="mr-2" /> {sortOption}
+                  {sidebarCollapsed ? (
+                    <ChevronRight size="16px" />
+                  ) : (
+                    <ChevronLeft size="16px" />
+                  )}
                 </Button>
-              </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+
+        <div className={`w-full py-8 px-6 flex flex-col gap-6 transition-all duration-300 ${
+          sidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        }`}>
+          <Logo />
+          <div className={`flex gap-4 transition-all duration-300 ${
+            sidebarCollapsed ? 'flex-col' : 'flex-row'
+          }`}>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className={`
+                      bg-secondary/80 text-foreground hover:bg-secondary/60 
+                      backdrop-blur-md shadow-lg rounded-xl 
+                      transition-all duration-300 border-none
+                      font-semibold
+                      hover:shadow-xl focus:ring-2 focus:ring-secondary/50 focus:outline-none
+                      ${sidebarCollapsed ? 'w-10 h-10 p-0' : ''}
+                    `}
+                    as="a"
+                    href="https://github.com/hmhngx"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="GitHub"
+                  >
+                    <Github size="14px" className={sidebarCollapsed ? '' : 'mr-2'} />
+                    {!sidebarCollapsed && 'GitHub'}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Visit GitHub profile</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className={`
+                      bg-secondary/80 text-foreground hover:bg-secondary/60 
+                      backdrop-blur-md shadow-lg rounded-xl 
+                      transition-all duration-300 border-none
+                      font-semibold
+                      hover:shadow-xl focus:ring-2 focus:ring-secondary/50 focus:outline-none
+                      ${sidebarCollapsed ? 'w-10 h-10 p-0' : ''}
+                    `}
+                    as="a"
+                    href="https://www.linkedin.com/in/hmh-nguyen/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="LinkedIn"
+                  >
+                    <Linkedin size="14px" className={sidebarCollapsed ? '' : 'mr-2'} />
+                    {!sidebarCollapsed && 'LinkedIn'}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Visit LinkedIn profile</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          {!sidebarCollapsed && <AnimatedDateTime />}
+          <div className={`flex gap-4 transition-all duration-300 ${
+            sidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="
+                          bg-secondary/80 text-foreground hover:bg-secondary/60 
+                          backdrop-blur-md shadow-lg rounded-xl 
+                          transition-all duration-300 border-none
+                          font-semibold
+                          hover:shadow-xl focus:ring-2 focus:ring-secondary/50 focus:outline-none
+                          min-w-[140px] justify-between
+                        "
+                      >
+                        <ArrowDown size="14px" className="mr-2" /> {sortOption}
+                      </Button>
+                    </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
                 className="
@@ -245,23 +315,30 @@ export default function Home() {
                   onClick={() => setSortOption("Name")}
                 />
               </DropdownMenuContent>
-            </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="
-                    bg-secondary/80 text-foreground hover:bg-secondary/60 
-                    backdrop-blur-md shadow-lg rounded-xl 
-                    transition-all duration-300 border-none
-                    font-semibold
-                    hover:shadow-xl focus:ring-2 focus:ring-secondary/50 focus:outline-none
-                    min-w-[140px] justify-between
-                  "
-                >
-                  <ListFilter size="14px" className="mr-2" /> {filterOption}
-                </Button>
-              </DropdownMenuTrigger>
+                    </DropdownMenu>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Sort buildings by different criteria</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="
+                          bg-secondary/80 text-foreground hover:bg-secondary/60 
+                          backdrop-blur-md shadow-lg rounded-xl 
+                          transition-all duration-300 border-none
+                          font-semibold
+                          hover:shadow-xl focus:ring-2 focus:ring-secondary/50 focus:outline-none
+                          min-w-[140px] justify-between
+                        "
+                      >
+                        <ListFilter size="14px" className="mr-2" /> {filterOption}
+                      </Button>
+                    </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
                 className="
@@ -288,10 +365,18 @@ export default function Home() {
                   onClick={() => setFilterOption("Closed")}
                 />
               </DropdownMenuContent>
-            </DropdownMenu>
+                    </DropdownMenu>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Filter buildings by status</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
-        <ScrollArea className="flex-grow overflow-y-auto">
+        <ScrollArea className={`flex-grow overflow-y-auto transition-all duration-300 ${
+          sidebarCollapsed ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        }`}>
           <div className="p-6 space-y-6">
             {displayedBuildings.length > 0 ? (
               displayedBuildings.map((building) => (

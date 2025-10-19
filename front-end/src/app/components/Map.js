@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Button } from "@/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/ui/tooltip";
 import { LocateIcon, RotateCw } from "lucide-react";
 import { convertToIdFormat } from "../../../services/formatId";
 
@@ -155,36 +156,52 @@ const Map = ({ data, coordinates, selectedCoordinates }) => {
   };
 
   return (
-    <div className="h-screen w-full relative">
-      <div ref={mapContainerRef} className="h-full w-full" />
-      <div className="absolute top-4 right-4 flex flex-col gap-3">
-        <Button
-          onClick={handleMapReset}
-          variant="secondary"
-          className="
-            bg-secondary/80 text-foreground hover:bg-secondary/60 
-            backdrop-blur-md shadow-lg rounded-xl 
-            transition-all duration-300 border-none
-            font-semibold
-          "
-        >
-          Reset Map <RotateCw size="14px" className="ml-2" />
-        </Button>
-        <Button
-          onClick={handleFlyToMe}
-          variant="secondary"
-          className="
-            bg-secondary/80 text-foreground hover:bg-secondary/60 
-            backdrop-blur-md shadow-lg rounded-xl 
-            transition-all duration-300 border-none
-            font-semibold
-          "
-          disabled={!coordinates}
-        >
-          Fly to Me <LocateIcon size="14px" className="ml-2" />
-        </Button>
+    <TooltipProvider>
+      <div className="h-screen w-full relative">
+        <div ref={mapContainerRef} className="h-full w-full" />
+        <div className="absolute top-4 right-4 flex flex-col gap-3">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleMapReset}
+                variant="secondary"
+                className="
+                  bg-secondary/80 text-foreground hover:bg-secondary/60 
+                  backdrop-blur-md shadow-lg rounded-xl 
+                  transition-all duration-300 border-none
+                  font-semibold
+                "
+              >
+                Reset Map <RotateCw size="14px" className="ml-2" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Reset map to default view</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleFlyToMe}
+                variant="secondary"
+                className="
+                  bg-secondary/80 text-foreground hover:bg-secondary/60 
+                  backdrop-blur-md shadow-lg rounded-xl 
+                  transition-all duration-300 border-none
+                  font-semibold
+                "
+                disabled={!coordinates}
+              >
+                Fly to Me <LocateIcon size="14px" className="ml-2" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{coordinates ? "Fly to your current location" : "Location not available"}</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 };
 
