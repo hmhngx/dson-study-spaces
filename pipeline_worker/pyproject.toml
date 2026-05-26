@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pipeline-worker"
+version = "0.1.0"
+description = "Data extraction pipeline with strict Pydantic data contracts"
+authors = []
+packages = [{ include = "pipeline_worker", from = "." }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic = "^2.0"
+playwright = "^1.40"
+beautifulsoup4 = "^4.12"
+aiohttp = "^3.9"
+supabase = "^2.0"
+python-dotenv = "^1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

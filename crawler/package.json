@@ -1,0 +1,16 @@
+{
+  "name": "dson-study-spaces-crawler",
+  "version": "1.0.0",
+  "description": "Playwright scraper for Dickinson College professor data",
+  "type": "module",
+  "main": "scraper.js",
+  "scripts": {
+    "scrape": "node -e \"console.error('Deprecated: use pipeline_worker (see .github/workflows/pipeline.yml)'); process.exit(1)\"",
+    "postinstall": "npx playwright install chromium"
+  },
+  "dependencies": {
+    "axios": "^1.8.2",
+    "dotenv": "^16.4.7",
+    "playwright": "^1.49.0"
+  }
+}
