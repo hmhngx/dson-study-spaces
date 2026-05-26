@@ -3,6 +3,5 @@ node_modules/
 *.log
 .vercel
 data/
-vercel.json
 dist/
 
