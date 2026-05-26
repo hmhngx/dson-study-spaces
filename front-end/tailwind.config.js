@@ -6,6 +6,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        xs: "400px",
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -28,9 +31,9 @@ module.exports = {
         ring: "rgba(59, 130, 246, 0.5)",
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'Inter', 'sans-serif'],
-        heading: ['var(--font-poppins)', 'Poppins', 'sans-serif'],
-        body: ['var(--font-inter)', 'Inter', 'sans-serif'],
+        sans: ['var(--font-dm-sans)', 'DM Sans', 'sans-serif'],
+        heading: ['var(--font-space-grotesk)', 'Space Grotesk', 'sans-serif'],
+        body: ['var(--font-dm-sans)', 'DM Sans', 'sans-serif'],
       },
     },
   },

@@ -1,5 +1,24 @@
 node_modules
 .vercel
 **/.next/
-**/vercel.json
-vercel.json
+
+# Pipeline logs
+logs/
+*.log
+
+# Environment files
+.env
+.env.local
+.env.development
+**/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Runtime logs
+error.log
+combined.log

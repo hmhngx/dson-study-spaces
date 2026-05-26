@@ -13,7 +13,7 @@ const FontExample = () => {
           </h1>
           <p className="text-lg text-muted-foreground font-body">
             This page demonstrates how Google Fonts are applied throughout the application.
-            The heading uses the heading font (Poppins) while body text uses the body font (Inter).
+            The heading uses Space Grotesk while body text uses DM Sans.
           </p>
         </div>
 
@@ -26,21 +26,21 @@ const FontExample = () => {
           <div className="space-y-6">
             {/* Headings */}
             <div className="space-y-4">
-              <h1 className="text-3xl font-bold text-foreground font-heading">Heading 1 - Poppins Bold</h1>
-              <h2 className="text-2xl font-semibold text-foreground font-heading">Heading 2 - Poppins Semibold</h2>
-              <h3 className="text-xl font-medium text-foreground font-heading">Heading 3 - Poppins Medium</h3>
-              <h4 className="text-lg font-medium text-foreground font-heading">Heading 4 - Poppins Medium</h4>
+              <h1 className="text-3xl font-bold text-foreground font-heading">Heading 1 - Space Grotesk Bold</h1>
+              <h2 className="text-2xl font-semibold text-foreground font-heading">Heading 2 - Space Grotesk Semibold</h2>
+              <h3 className="text-xl font-medium text-foreground font-heading">Heading 3 - Space Grotesk Medium</h3>
+              <h4 className="text-lg font-medium text-foreground font-heading">Heading 4 - Space Grotesk Medium</h4>
             </div>
 
             {/* Body Text */}
             <div className="space-y-4">
               <p className="text-base text-foreground font-body leading-relaxed">
-                This is body text using Inter font. It is designed for optimal readability at all sizes. 
+                This is body text using DM Sans. It is designed for optimal readability at all sizes. 
                 The font is clean, modern, and highly legible for extended reading.
               </p>
               
               <p className="text-sm text-muted-foreground font-body leading-relaxed">
-                This is smaller body text, also using Inter. It maintains excellent readability 
+                This is smaller body text, also using DM Sans. It maintains excellent readability 
                 even at smaller sizes and is perfect for secondary information and captions.
               </p>
             </div>
@@ -65,22 +65,22 @@ const FontExample = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground font-heading">Body Font: Inter</h3>
+              <h3 className="text-lg font-semibold text-foreground font-heading">Body Font: DM Sans</h3>
               <ul className="space-y-2 text-sm text-muted-foreground font-body">
                 <li>• Used for paragraphs and body text</li>
                 <li>• Clean and highly readable</li>
                 <li>• Optimized for screen display</li>
-                <li>• Available weights: 300, 400, 500, 600, 700</li>
+                <li>• Available weights: 400, 500, 600, 700</li>
               </ul>
             </div>
             
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-foreground font-heading">Heading Font: Poppins</h3>
+              <h3 className="text-lg font-semibold text-foreground font-heading">Heading Font: Space Grotesk</h3>
               <ul className="space-y-2 text-sm text-muted-foreground font-body">
                 <li>• Used for titles and headings</li>
                 <li>• Modern geometric design</li>
                 <li>• Great for UI elements</li>
-                <li>• Available weights: 300, 400, 500, 600, 700, 800</li>
+                <li>• Available weights: 400, 500, 600, 700</li>
               </ul>
             </div>
           </div>
@@ -101,20 +101,20 @@ const FontExample = () => {
               <pre className="text-sm font-mono text-foreground overflow-x-auto">
 {`export const FONT_CONFIG = {
   // Body font (for regular text, paragraphs, etc.)
-  body: inter, // Change this to any body font
+  body: dmSans, // Change this to any body font
   
   // Heading font (for titles, headings, buttons, etc.)
-  heading: poppins, // Change this to any heading font
+  heading: spaceGrotesk, // Change this to any heading font
   
   // Font family names for CSS
-  bodyFamily: "Inter", // Update this to match
-  headingFamily: "Poppins", // Update this to match
+  bodyFamily: "DM Sans", // Update this to match
+  headingFamily: "Space Grotesk", // Update this to match
 };`}
               </pre>
             </div>
             
             <p className="text-sm text-muted-foreground font-body">
-              Available fonts include: Inter, Roboto, Open Sans, Lato, Nunito, Source Sans 3, Poppins, and Montserrat. 
+              Available fonts include: DM Sans, Space Grotesk, Inter, Roboto, Open Sans, Lato, Nunito, Source Sans 3, Poppins, and Montserrat. 
               See the <code className="bg-muted px-1 py-0.5 rounded text-xs">FONT_GUIDE.md</code> for complete instructions.
             </p>
           </div>
@@ -146,9 +146,9 @@ const FontExample = () => {
             <div className="bg-muted/50 p-4 rounded-lg">
               <pre className="text-sm font-mono text-foreground overflow-x-auto">
 {`// Examples
-<h1 className="font-heading font-bold">Heading with Poppins</h1>
-<p className="font-body">Body text with Inter</p>
-<Button className="font-heading">Button with Poppins</Button>`}
+<h1 className="font-heading font-bold">Heading with Space Grotesk</h1>
+<p className="font-body">Body text with DM Sans</p>
+<Button className="font-heading">Button with Space Grotesk</Button>`}
               </pre>
             </div>
           </div>

@@ -1,0 +1,17 @@
+# DEPRECATED: Node crawler replaced by pipeline_worker (.github/workflows/pipeline.yml).
+# This workflow is disabled to prevent dual-writer ingestion and identity collisions.
+name: Professor scraper (deprecated)
+
+on:
+  workflow_dispatch:
+    # Manual runs only — scheduled ingestion uses pipeline.yml
+
+jobs:
+  deprecated_notice:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deprecation notice
+        run: |
+          echo "The Node scraper (crawler/scraper.js) is deprecated."
+          echo "Use the Faculty pipeline workflow (pipeline.yml) instead."
+          exit 1

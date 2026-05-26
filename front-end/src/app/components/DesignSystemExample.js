@@ -183,7 +183,7 @@ const DesignSystemExample = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mockBuildings.map((building, index) => (
               <div
-                key={building.name}
+                key={building.id ?? building.name}
                 className={`
                   flex flex-col gap-3 p-4 rounded-2xl
                   backdrop-blur-lg bg-gray-800/40 dark:bg-gray-900/50

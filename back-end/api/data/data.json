@@ -137,7 +137,7 @@
   },
   {
     "name": "Denim Coffee at the Quarry",
-    "coords": [40.20346292960079, -77.19610767246922],
+    "coords": [40.203462, -77.196107],
     "address": "51 N College St, Carlisle, PA 17013",
     "hours": {
       "Monday": ["08:00", "17:00"],
@@ -188,7 +188,7 @@
   },
   {
     "name": "Kaufman Hall / Stafford Greenhouse",
-    "coords": [40.20495553977638, -77.20029002348566],
+    "coords": [40.204955, -77.200290],
     "address": "400 W North St, Carlisle, PA 17013",
     "hours": {
       "Monday": ["08:00", "22:00"],
@@ -225,16 +225,101 @@
     "address": "208 W Louther St, Carlisle, PA 17013",
     "coords": [40.203309, -77.194562],
     "hours": {
-        "Monday": ["08:00", "16:00"],
-        "Tuesday": ["08:00", "16:00"],
-        "Wednesday": ["08:00", "16:00"],
-        "Thursday": ["08:00", "16:00"],
-        "Friday": ["08:00", "16:00"],
-        "Saturday": ["08:00", "16:00"],
-        "Sunday": ["08:00", "16:00"]
+      "Monday": ["08:00", "16:00"],
+      "Tuesday": ["08:00", "16:00"],
+      "Wednesday": ["08:00", "16:00"],
+      "Thursday": ["08:00", "16:00"],
+      "Friday": ["08:00", "16:00"],
+      "Saturday": ["08:00", "16:00"],
+      "Sunday": ["08:00", "16:00"]
     },
     "station": "Carlisle",
     "rating": 4.5,
     "image": "/images/Stern.jpg"
-}
+  },
+  {
+    "name": "Montgomery Hall",
+    "address": "360 W Louther St, Carlisle, PA 17013",
+    "coords": [40.203129, -77.197435],
+    "hours": {
+      "Monday": ["07:00", "22:00"],
+      "Tuesday": ["07:00", "22:00"],
+      "Wednesday": ["07:00", "22:00"],
+      "Thursday": ["07:00", "22:00"],
+      "Friday": ["07:00", "22:00"],
+      "Saturday": ["07:00", "22:00"],
+      "Sunday": ["07:00", "22:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.5,
+    "image": "/images/montgomery.jpg"
+  },
+  {
+    "name": "Landis House",
+    "address": "101 S College St, Carlisle, PA 17013",
+    "coords": [40.200357, -77.196363],
+    "hours": {
+      "Monday": ["08:00", "22:00"],
+      "Tuesday": ["08:00", "22:00"],
+      "Wednesday": ["08:00", "22:00"],
+      "Thursday": ["08:00", "22:00"],
+      "Friday": ["08:00", "22:00"],
+      "Saturday": ["08:00", "22:00"],
+      "Sunday": ["08:00", "22:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.2,
+    "image": "/images/landis.jpg"
+  },
+  {
+    "name": "Keck Archaeology Laboratory",
+    "address": "Carlisle, PA 17013",
+    "coords": [40.202453, -77.193383],
+    "hours": {
+      "Monday": ["08:00", "22:00"],
+      "Tuesday": ["08:00", "22:00"],
+      "Wednesday": ["08:00", "22:00"],
+      "Thursday": ["08:00", "22:00"],
+      "Friday": ["08:00", "22:00"],
+      "Saturday": ["08:00", "22:00"],
+      "Sunday": ["08:00", "22:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.0,
+    "image": "/images/keck.jpg"
+  },
+  {
+    "name": "ROTC Building",
+    "address": "554 W Louther St, Carlisle, PA 17013",
+    "coords": [40.204962379194505, -77.20748674505384],
+    "hours": {
+      "Monday": ["08:00", "17:00"],
+      "Tuesday": ["08:00", "17:00"],
+      "Wednesday": ["08:00", "17:00"],
+      "Thursday": ["08:00", "17:00"],
+      "Friday": ["08:00", "17:00"],
+      "Saturday": ["08:00", "17:00"],
+      "Sunday": ["08:00", "17:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.0,
+    "image": "/images/rotc.jpg"
+  },
+  {
+    "name": "Educational Studies Department Building",
+    "address": "57 S College St, Carlisle, PA 17013",
+    "coords": [40.200795, -77.196379],
+    "hours": {
+      "Monday": ["08:00", "22:00"],
+      "Tuesday": ["08:00", "22:00"],
+      "Wednesday": ["08:00", "22:00"],
+      "Thursday": ["08:00", "22:00"],
+      "Friday": ["08:00", "22:00"],
+      "Saturday": ["08:00", "22:00"],
+      "Sunday": ["08:00", "22:00"]
+    },
+    "station": "Carlisle",
+    "rating": 4.0,
+    "image": "/images/educational.jpg"
+  }
 ]

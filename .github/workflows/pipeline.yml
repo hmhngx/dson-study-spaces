@@ -1,0 +1,38 @@
+# Dickinson College faculty pipeline — Python pipeline_worker (source of truth).
+name: Faculty pipeline
+
+on:
+  schedule:
+    # Every Sunday at 2:00 AM UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+
+concurrency:
+  group: data-pipeline
+  cancel-in-progress: false
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Poetry and dependencies
+        run: |
+          pip install poetry
+          cd pipeline_worker
+          poetry install --no-interaction
+          poetry run playwright install chromium --with-deps
+
+      - name: Run faculty pipeline
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: poetry run python -m pipeline_worker.main_orchestrator
+        working-directory: pipeline_worker

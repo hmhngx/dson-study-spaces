@@ -18,11 +18,17 @@ export default function Logo() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Visit Dickinson College website"
-            className="flex items-center gap-2 transition-all duration-300 shadow-md hover:scale-105 hover:shadow-lg rounded-lg p-2"
+            className="flex items-center gap-2 min-w-0 max-w-full transition-all duration-300 shadow-md hover:scale-105 active:scale-100 hover:shadow-lg rounded-lg p-2 min-h-11"
           >
-            <Image src="/images/newlogo.png" alt="App Icon" width={50} height={50} />
+            <Image
+              src="/images/newlogo.png"
+              alt="App Icon"
+              width={50}
+              height={50}
+              className="w-10 h-10 sm:w-[50px] sm:h-[50px] shrink-0"
+            />
             <h1
-              className={`text-2xl font-bold tracking-tight text-white shadow-text ${urbanist.variable}`}
+              className={`text-lg sm:text-2xl font-bold tracking-tight text-white shadow-text truncate ${urbanist.variable}`}
             >
               dson-study-spaces
             </h1>
