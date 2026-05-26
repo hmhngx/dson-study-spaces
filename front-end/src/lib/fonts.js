@@ -1,4 +1,15 @@
-import { Inter, Poppins, Roboto, Open_Sans, Montserrat, Lato, Nunito, Source_Sans_3 } from "next/font/google";
+import {
+  DM_Sans,
+  Inter,
+  Lato,
+  Montserrat,
+  Nunito,
+  Open_Sans,
+  Poppins,
+  Roboto,
+  Source_Sans_3,
+  Space_Grotesk,
+} from "next/font/google";
 
 // Primary Font Options - Choose one for body text
 export const inter = Inter({
@@ -37,6 +48,12 @@ export const sourceSans3 = Source_Sans_3({
   variable: "--font-source-sans-3",
 });
 
+export const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-dm-sans",
+});
+
 // Heading Font Options - Choose one for headings
 export const poppins = Poppins({
   subsets: ["latin"],
@@ -50,17 +67,23 @@ export const montserrat = Montserrat({
   variable: "--font-montserrat",
 });
 
+export const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-space-grotesk",
+});
+
 // Font Configuration - Change these to switch fonts
 export const FONT_CONFIG = {
   // Body font (for regular text, paragraphs, etc.)
-  body: inter, // Options: inter, roboto, openSans, lato, nunito, sourceSans3
+  body: dmSans, // Options: dmSans, inter, roboto, openSans, lato, nunito, sourceSans3
   
   // Heading font (for titles, headings, buttons, etc.)
-  heading: poppins, // Options: poppins, montserrat
+  heading: spaceGrotesk, // Options: spaceGrotesk, poppins, montserrat
   
   // Font family names for CSS
-  bodyFamily: "Inter",
-  headingFamily: "Poppins",
+  bodyFamily: "DM Sans",
+  headingFamily: "Space Grotesk",
 };
 
 // Helper function to get all font variables
@@ -75,6 +98,12 @@ export const getFontClasses = () => {
 
 // Popular Google Font Combinations
 export const FONT_PRESETS = {
+  atlas: {
+    body: dmSans,
+    heading: spaceGrotesk,
+    bodyFamily: "DM Sans",
+    headingFamily: "Space Grotesk",
+  },
   modern: {
     body: inter,
     heading: poppins,

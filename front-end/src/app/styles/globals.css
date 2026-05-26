@@ -63,11 +63,11 @@
   }
 
   .font-heading {
-    font-family: var(--font-poppins), 'Poppins', sans-serif;
+    font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
   }
 
   .font-body {
-    font-family: var(--font-inter), 'Inter', sans-serif;
+    font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
   }
 }
 
@@ -79,38 +79,58 @@
   button {
     @apply border-none;
     border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    font-family: var(--font-poppins), 'Poppins', sans-serif; 
+    font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
     font-weight: 600;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.01em;
   }
 
-  button:focus,
-  a:focus,
-  input:focus,
-  textarea:focus,
-  select:focus {
-    outline: none !important;
-    box-shadow: none !important;
+  :focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
   }
 
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-inter), 'Inter', sans-serif;
+    font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
     font-weight: 400;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.005em;
     line-height: 1.55;
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4 {
-    font-family: var(--font-poppins), 'Poppins', sans-serif;
+    font-family: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
     font-weight: 600;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
+    line-height: 1.08;
   }
 }
 
 @layer utilities {
+  /* Minimum 44×44px touch targets (WCAG 2.5.5) */
+  .touch-target {
+    @apply min-h-11 min-w-11 inline-flex items-center justify-center;
+  }
+
+  .touch-target-inline {
+    @apply min-h-11 px-4 inline-flex items-center justify-center gap-2;
+  }
+
+  .touch-range {
+    @apply w-full h-3 sm:h-2 appearance-none rounded-full cursor-pointer accent-violet-500;
+  }
+
+  .panel-glass-control {
+    @apply bg-white/10 hover:bg-white/15 active:bg-white/20 backdrop-blur-md;
+    border: 1px solid rgb(255 255 255 / 0.1) !important;
+  }
+
   .shadow-text {
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
   }
@@ -142,10 +162,12 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
+  height: 100dvh;
   overflow: hidden;
 }
 
 #__next {
   width: 100%;
   height: 100%;
+  height: 100dvh;
 }

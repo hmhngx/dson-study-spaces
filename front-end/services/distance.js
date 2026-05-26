@@ -1,10 +1,7 @@
 import axios from "axios";
+import { convertToIdFormat } from "./formatId";
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3002/api/buildings";
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
-
-console.log("Base URL:", baseUrl);
-console.log("API Key:", API_KEY);
+const baseUrl = "/api/buildings";
 
 const isBuildingOpen = (building, datetime) => {
   const day = datetime.toLocaleString('en-US', { weekday: 'long' });
@@ -20,7 +17,6 @@ const isBuildingOpen = (building, datetime) => {
   return currentTime >= startTime && currentTime <= endTime;
 };
 
-// Vincenty distance calculation (same as before)
 function vincentyDistance([lat1, lon1], [lat2, lon2]) {
   const toRadians = (deg) => (deg * Math.PI) / 180;
   const a = 6378137.0;
@@ -88,94 +84,55 @@ function vincentyDistance([lat1, lon1], [lat2, lon2]) {
 
   const distance = b * A * (σ - Δσ);
 
-  return distance / 1000; // Distance in kilometers
+  return distance / 1000;
 }
 
-// Fetch and sort buildings by distance
+function parseBuildingsResponse(data) {
+  const buildings = data?.data;
+  if (!Array.isArray(buildings)) {
+    throw new Error("Invalid buildings response");
+  }
+  return buildings;
+}
+
+function enrichAndSortBuildings(buildings, lat, lng) {
+  const current = new Date();
+  const buildingsWithDetails = buildings.map((building) => ({
+    ...building,
+    slug: building.slug ?? convertToIdFormat(building.name),
+    id: building.id ?? building.slug ?? convertToIdFormat(building.name),
+    status: isBuildingOpen(building, current) ? "Open" : "Closed",
+    distance: vincentyDistance([lat, lng], building.coords),
+  }));
+
+  buildingsWithDetails.sort((a, b) => a.distance - b.distance);
+  return buildingsWithDetails;
+}
+
 export async function fetchAndSortBuildings(lat, lng) {
+  const url = `${baseUrl}?lat=${lat}&lng=${lng}`;
+
   try {
-    const response = await axios.get(`${baseUrl}?lat=${lat}&lng=${lng}`, {
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-      },
-    });
-
-    // Axios automatically parses JSON, so use response.data
-    const data = response.data;
-    console.log("Raw response data:", data);
-
-    if (!data.data) {
-      throw new Error("No data field in response");
+    const response = await axios.get(url);
+    if (response.status >= 400) {
+      throw new Error(`Buildings request failed with status ${response.status}`);
     }
-
-    // Decode the base64-encoded data using atob (browser-compatible)
-    const decodedData = JSON.parse(atob(data.data));
-    console.log("Decoded buildings:", decodedData);
-
-    // Process each building
-    const current = new Date();
-    const buildingsWithDetails = decodedData.map((building) => {
-      // Use the image field provided by the backend
-      const imagePath = building.image;
-      console.log(`Image for ${building.name}: ${imagePath || 'none (will use placeholder)'}`);
-
-      return {
-        ...building,
-        status: isBuildingOpen(building, current) ? "Open" : "Closed",
-        distance: vincentyDistance([lat, lng], building.coords),
-      };
-    });
-    console.log("Buildings with details:", buildingsWithDetails);
-
-    // Sort by distance
-    buildingsWithDetails.sort((a, b) => a.distance - b.distance);
-    console.log("Sorted buildings:", buildingsWithDetails);
-
-    return buildingsWithDetails;
+    return enrichAndSortBuildings(parseBuildingsResponse(response.data), lat, lng);
   } catch (error) {
-    console.error("Error in fetchAndSortBuildings:", error.message || error);
-    // Retry logic: 2 retries with 1-second delay
     for (let attempt = 1; attempt <= 2; attempt++) {
-      console.log(`Retry attempt ${attempt}...`);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       try {
-        const response = await axios.get(`${baseUrl}?lat=${lat}&lng=${lng}`, {
-          headers: {
-            Authorization: `Bearer ${API_KEY}`,
-          },
-        });
-        const data = response.data;
-        console.log("Retry raw response data:", data);
-        if (!data.data) {
-          throw new Error("No data field in retry response");
+        const response = await axios.get(url);
+        if (response.status >= 400) {
+          throw new Error(`Buildings request failed with status ${response.status}`);
         }
-        const decodedData = JSON.parse(atob(data.data));
-        console.log("Retry decoded buildings:", decodedData);
-
-        const current = new Date();
-        const buildingsWithDetails = decodedData.map((building) => {
-          const imagePath = building.image;
-          console.log(`Retry image for ${building.name}: ${imagePath || 'none (will use placeholder)'}`);
-          return {
-            ...building,
-            status: isBuildingOpen(building, current) ? "Open" : "Closed",
-            distance: vincentyDistance([lat, lng], building.coords),
-          };
-        });
-        console.log("Retry buildings with details:", buildingsWithDetails);
-
-        buildingsWithDetails.sort((a, b) => a.distance - b.distance);
-        console.log("Retry sorted buildings:", buildingsWithDetails);
-
-        return buildingsWithDetails;
+        return enrichAndSortBuildings(parseBuildingsResponse(response.data), lat, lng);
       } catch (retryError) {
-        console.error(`Retry ${attempt} failed:`, retryError.message || retryError);
         if (attempt === 2) {
-          console.error("All retries failed. Returning empty array.");
-          return [];
+          throw new Error("Failed to fetch buildings");
         }
       }
     }
-    return []; // Fallback return to ensure a value is always returned
+    throw new Error("Failed to fetch buildings");
   }
 }

@@ -1,7 +1,6 @@
-export const sortBuildings = (buildings, option) => {
-  console.log("Sorting buildings with option:", option);
-  console.log("Buildings before sorting:", buildings);
+import { checkIsOpenNow } from "@/lib/utils";
 
+export const sortBuildings = (buildings, option) => {
   switch (option) {
     case "Closest":
       return [...buildings].sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
@@ -16,15 +15,12 @@ export const sortBuildings = (buildings, option) => {
   }
 };
 
-export const filterBuildings = (buildings, option) => {
-  console.log("Filtering buildings with option:", option);
-  console.log("Buildings before filtering:", buildings);
-
+export const filterBuildings = (buildings, option, now = new Date()) => {
   switch (option) {
     case "Open":
-      return buildings.filter((building) => building.status === "Open");
+      return buildings.filter((building) => checkIsOpenNow(building.hours, now));
     case "Closed":
-      return buildings.filter((building) => building.status === "Closed");
+      return buildings.filter((building) => !checkIsOpenNow(building.hours, now));
     case "All":
     default:
       return buildings;
