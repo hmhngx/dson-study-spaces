@@ -22,3 +22,10 @@ __pycache__/
 # Runtime logs
 error.log
 combined.log
+
+# Understand Anything
+.understand-anything/
+.understand-anything-tmp/
+.understand-anything-output/
+.understand-anything-input/
+.understand-anything-output/

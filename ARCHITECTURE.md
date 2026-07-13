@@ -17,7 +17,22 @@ Dickinson Study Spaces is a full-stack web application that helps Dickinson Coll
 
 External dependencies: Mapbox GL JS (client-side map tiles), Dickinson College faculty directory (scrape target), GitHub Actions (scheduled pipeline execution).
 
-**Live deployment:** [dson-study-spaces.vercel.app/home](https://dson-study-spaces.vercel.app/home)
+**Live deployment:** [https://dson-study-spaces.vercel.app/home](https://dson-study-spaces.vercel.app/home)
+
+### Logical layers (codebase map)
+
+These layers match how the repository is organized for navigation (also reflected in the Understand Anything knowledge graph):
+
+| Layer | Responsibility | Primary paths |
+|-------|----------------|---------------|
+| **Frontend UI** | App Router pages, map shell, cards, directory | `front-end/src/app/` |
+| **Frontend Services** | Distance/sort/filter, live-mode helpers, TanStack hooks, env | `front-end/services/`, `front-end/src/hooks/`, `front-end/src/lib/` |
+| **Backend API** | Express REST, auth middleware, hybrid buildings merge | `back-end/api/` |
+| **Data Schema** | Temporal OH, FTS, identity keys, RLS | `supabase/migrations/` |
+| **Ingestion Pipeline** | Discover → fetch → parse → upsert | `pipeline_worker/` |
+| **Infrastructure** | CI schedules, Vercel entry | `.github/workflows/`, `back-end/vercel.json` |
+| **Documentation** | Ops + design docs | `README.md`, `ARCHITECTURE.md` |
+| **Deprecated Legacy** | Node crawler + scraper workflow (manual; exits 1) | `crawler/`, `.github/workflows/scraper.yml` |
 
 ---
 
@@ -90,7 +105,7 @@ flowchart TB
   end
 
   subgraph stage1 [Stage 1 — Discovery]
-    Seeds["DEPARTMENT_SEED_URLS\n~47 departmental pages"]
+    Seeds["DEPARTMENT_SEED_URLS\n48 seed URLs"]
     PW["Playwright Chromium\n5 concurrent pages per batch"]
     Seeds --> PW
     PW --> URLMap["url → dept_hint map"]
@@ -139,7 +154,7 @@ flowchart TB
 
 | Stage | Module | Concurrency | Output |
 |-------|--------|-------------|--------|
-| 1 — Discovery | [discovery_playwright.py](pipeline_worker/pipeline_worker/crawlers/discovery_playwright.py) | 5 Playwright pages/batch; 0.5s inter-batch pause; 3 retry attempts | `dict[profile_url → department_hint]` |
+| 1 — Discovery | [discovery_playwright.py](pipeline_worker/pipeline_worker/crawlers/discovery_playwright.py) | 48 seed URLs; 5 Playwright pages/batch; 0.5s inter-batch pause; 3 retry attempts | `dict[profile_url → department_hint]` |
 | 2 — Fetch | [main_orchestrator.py](pipeline_worker/pipeline_worker/main_orchestrator.py) | 10 concurrent aiohttp requests; `sleep(batch_size / 2.0)` → 2 RPS | `(fac_id, html \| None)` tuples |
 | 3 — Extract | [html_scraper.py](pipeline_worker/pipeline_worker/parsers/html_scraper.py), [office_hours_fsm.py](pipeline_worker/pipeline_worker/parsers/office_hours_fsm.py) | Sequential per profile | `FacultyProfile` (Pydantic) |
 | 4 — Persist | `upsert_to_supabase()` in orchestrator | Sequential (sync supabase-py v2) | Rows in `departments`, `professors`, `professor_office_hours` |
@@ -185,13 +200,14 @@ sequenceDiagram
 
   Note over Browser,DataJson: Buildings path — BFF with secret injection
 
-  Browser->>NextRoute: GET /api/buildings?lat=&lng=
-  NextRoute->>NextRoute: Read INTERNAL_API_SECRET from env
+  Browser->>NextRoute: GET /api/buildings
+  Note over Browser,NextRoute: Client may attach ?lat=&lng= for local Vincenty sort;<br/>Express ignores those query params
+  NextRoute->>NextRoute: Read INTERNAL_API_SECRET (or INTERNAL_API_KEY) from env
   NextRoute->>Express: fetch BACKEND_URL/api/buildings<br/>Authorization: Bearer SECRET
   Express->>Express: buildingsAuthMiddleware validates Bearer
   Express->>DataJson: loadStaticBuildings()
   Express->>Supabase: SELECT id, name FROM buildings
-  Express->>Express: mergeSupabaseBuildingIds()
+  Express->>Express: mergeSupabaseBuildingIds(); status via server local time
   Express-->>NextRoute: JSON { data: Building[] }
   NextRoute-->>Browser: Passthrough body + Cache-Control
 
@@ -249,13 +265,13 @@ Root layout ([src/app/layout.js](front-end/src/app/layout.js)) wraps all pages i
 
 TanStack Query handles all server-state fetching:
 
-| Hook / Query | Key | Endpoint | Notes |
-|--------------|-----|----------|-------|
-| `useQuery` (inline) | `["buildings", lat, lng]` | `/api/buildings` | Vincenty distance sort client-side |
-| `useDepartments` | `["departments"]` | `/api/professors/departments` | `staleTime: Infinity` |
-| `useProfessors` | `["professors", q, deptId, liveSync]` | `/api/professors` | 300ms debounce in UI |
-| `useActiveNowBuildingIds` | `["professors", "active-now"]` | `/api/professors/active-now` | Enabled only when live mode active; 60s refetch |
-| `useLiveTime` | — | — | Local `setInterval` tick for campus-time UI refresh |
+| Hook / Query | Key | Endpoint | Caching | Notes |
+|--------------|-----|----------|---------|-------|
+| `useQuery` (inline) | `["buildings", lat, lng]` | `/api/buildings` | Default `staleTime: 0` | Vincenty distance sort client-side after fetch |
+| `useDepartments` | `["departments"]` | `/api/professors/departments` | `staleTime: Infinity` | Loaded once per session |
+| `useProfessors` | `["professors", q, deptId, liveSync]` | `/api/professors` | `staleTime: 30_000` | 300ms debounce in UI; `liveSync` option exists but UI currently always passes `false` |
+| `useActiveNowBuildingIds` | `["professors", "active-now"]` | `/api/professors/active-now` | `staleTime: 30_000`, `refetchInterval: 60_000` | Enabled only when live mode is active |
+| `useLiveTime` | — | — | 60s tick | Local `setInterval` for campus-time UI refresh |
 
 No global Redux/Zustand store. Ephemeral UI state (sidebar collapse, active view, time travel hour) lives in `home/page.js` local state.
 
@@ -307,10 +323,18 @@ Both paths use campus timezone `America/New_York` ([utils.js](front-end/src/lib/
 | Module | Responsibility |
 |--------|----------------|
 | [distance.js](front-end/services/distance.js) | Fetch `/api/buildings`, Vincenty distance calculation, client-side open/closed enrichment |
-| [operation.js](front-end/services/operation.js) | Sort (Closest, Furthest, Rating, Name) and filter (Open/Closed) using campus ET |
-| [liveMode.js](front-end/services/liveMode.js) | Client-side office-hours presence check, active building ID aggregation |
+| [operation.js](front-end/services/operation.js) | Sort (Closest, Furthest, Highest Rated, Name) and filter (Open/Closed) using campus ET |
+| [liveMode.js](front-end/services/liveMode.js) | `isProfessorInOffice`, `getActiveBuildingIds` (exported, unused by UI), `matchBuildingFromLocation` |
 
-**Known inconsistency:** `distance.js` computes open/closed status using the browser's local timezone during fetch enrichment, while `operation.js` and live mode use campus ET. Filter/sort after initial load uses campus time; initial card status from distance fetch may diverge for non-ET users.
+**Timezone split (do not overstate ET coverage):**
+
+| Path | Timezone used for open/closed or “in office” |
+|------|-----------------------------------------------|
+| `operation.js`, `Map.js`, cards, live-mode client checks, `GET /api/professors/active-now` | Campus `America/New_York` |
+| `distance.js` fetch enrichment (`status` on building objects) | **Browser local** |
+| Express `GET /api/buildings` `status` field | **Server local** |
+
+Production cards/map mostly re-evaluate with campus ET; the API `status` field and `distance.js` enrichment can disagree for non-ET users until UI recomputation.
 
 ---
 
@@ -430,13 +454,13 @@ Run order: seed buildings first, then map departments.
 #### Orchestration phases
 
 ```
-discover_profile_urls()     → Playwright, ~47 seed URLs
+discover_profile_urls()     → Playwright, 48 seed URLs
 fetch_profile_html()        → aiohttp, 2 RPS
 extract_profiles()          → ProfileExtractor + OfficeHoursFSM
 upsert_to_supabase()        → Sequential Supabase writes per profile
 ```
 
-Discovery retries the entire browser session up to 3 times with exponential backoff (2s base). Individual page failures (404, timeout) are absorbed. Fetch failures return `(fac_id, None)` and increment skip count.
+Discovery retries the entire browser session up to 3 times with exponential backoff (2s base). Individual page failures (404, timeout) are absorbed. Fetch failures return `(fac_id, None)` and increment skip count. One seed URL is a department-hours page (not a faculty roster); discovery absorbs non-profile results.
 
 Canonical profile URL template (regardless of discovery href variant):
 
@@ -717,11 +741,11 @@ Migration path: deploy Express to a long-running host, set `BACKEND_URL` on the 
 
 ### ADR-008: Campus timezone (`America/New_York`)
 
-**Context:** Dickinson College operates on Eastern Time. Open/closed status, live mode, and time travel must reflect campus local time regardless of user's browser timezone.
+**Context:** Dickinson College operates on Eastern Time. Open/closed status, live mode, and time travel should reflect campus local time regardless of the user's browser timezone.
 
-**Decision:** Canonical timezone constant `CAMPUS_TIMEZONE = "America/New_York"` in [utils.js](front-end/src/lib/utils.js). All open/closed checks in filters, map markers, and server `active-now` endpoint use campus ET.
+**Decision:** Canonical timezone constant `CAMPUS_TIMEZONE = "America/New_York"` in [utils.js](front-end/src/lib/utils.js). Primary UI paths (filters, map markers, time travel, live-mode client checks) and `GET /api/professors/active-now` use campus ET.
 
-**Consequence:** `distance.js` still computes initial building status using browser local time during fetch enrichment — an inconsistency for users outside ET until filter/sort re-evaluates with campus time.
+**Consequence:** Coverage is **not** universal. `distance.js` fetch enrichment and Express `GET /api/buildings` still compute `status` with browser/server local time. Those fields can disagree with campus-ET UI until recomputation. Prefer campus-ET helpers for any new open/closed logic.
 
 ---
 
@@ -729,14 +753,14 @@ Migration path: deploy Express to a long-running host, set `BACKEND_URL` on the 
 
 | Method | Path | Auth | Cache | Description |
 |--------|------|------|-------|-------------|
-| `GET` | `/` | None | — | Health check |
-| `GET` | `/api/buildings` | Bearer `INTERNAL_API_SECRET` | 300s | Building list with status, slugs, Supabase UUIDs |
+| `GET` | `/` | None | — | Welcome JSON (`{ message: "Welcome to the Dickinson Study Spaces Backend" }`) — not a health probe |
+| `GET` | `/api/buildings` | `Authorization: Bearer <INTERNAL_API_SECRET\|INTERNAL_API_KEY>` | 300s | Building list with status, slugs, Supabase UUIDs; ignores `lat`/`lng` if present |
 | `GET` | `/api/professors` | None | 60s | Search/list professors; FTS when `q` present |
 | `GET` | `/api/professors/departments` | None | 300s | All departments ordered by name |
 | `GET` | `/api/professors/active-now` | None | 60s | Building UUIDs with faculty in office now (campus ET) |
-| `POST` | `/api/professors/sync` | `INTERNAL_CRON_SECRET` | — | Bulk professor upsert (legacy; no office hours) |
+| `POST` | `/api/professors/sync` | Raw `INTERNAL_CRON_SECRET` or `Bearer <secret>` | — | Bulk professor upsert (legacy; no office hours) |
 
-Query parameters for `GET /api/professors`: `q`, `department_id`, `building_id`, `limit`, `offset`, `live_sync`, `all`.
+Query parameters for `GET /api/professors`: `q`, `department_id`, `building_id` (UUID or slug), `limit` (default 20, max 100), `offset`, `live_sync=true` / `all=true` (fetch up to 10 000 rows).
 
 ---
 
@@ -749,16 +773,23 @@ Query parameters for `GET /api/professors`: `q`, `department_id`, `building_id`,
 | Non-transactional OH expire+insert | Concurrent pipeline runs could produce transient inconsistent state | [main_orchestrator.py](pipeline_worker/pipeline_worker/main_orchestrator.py) |
 | `location` column rarely populated | FSM does not extract location text; fingerprint includes empty location | [office_hours_fsm.py](pipeline_worker/pipeline_worker/parsers/office_hours_fsm.py) |
 | Dual live-mode evaluation paths | Map (server) and list (client) could diverge if data is stale | [useActiveNowBuildingIds.js](front-end/src/hooks/useActiveNowBuildingIds.js), [liveMode.js](front-end/services/liveMode.js) |
-| Campus TZ inconsistency in distance fetch | Initial building card status may use browser TZ | [distance.js](front-end/services/distance.js) |
-| Unused `@googlemaps/google-maps-services-js` dependency | Dead weight in back-end package | [back-end/package.json](back-end/package.json) |
+| Campus TZ inconsistency in distance fetch + Express buildings `status` | API/`distance.js` status may use non-ET clocks | [distance.js](front-end/services/distance.js), [buildings.js](back-end/api/routes/buildings.js) |
+| Unused `@googlemaps/google-maps-services-js` dependency | Dead weight in back-end package (map stack is Mapbox) | [back-end/package.json](back-end/package.json) |
 | No API rate limiting | Public professor endpoints unthrottled at Express layer | [api/index.js](back-end/api/index.js) |
 | `phone_number`, `status` extracted but not stored | Data loss from scrape | [models.py](pipeline_worker/pipeline_worker/parsers/models.py) |
+| `getActiveBuildingIds` / `useProfessors({ liveSync })` unused by UI | Dead API surface; map uses server `active-now` instead | [liveMode.js](front-end/services/liveMode.js), [useProfessors.js](front-end/src/hooks/useProfessors.js) |
+| Orphan Radix UI wrappers | Accordion/button/popover/scroll-area/tooltip unused by import graph | [front-end/src/ui/](front-end/src/ui/) |
 
 ---
 
 ## 11. Related Documentation
 
 - [README.md](README.md) — Installation, environment setup, migration bootstrap, deployment commands
+- [front-end/README.md](front-end/README.md) — Next.js package docs (BFF, map, hooks)
+- [back-end/README.md](back-end/README.md) — Express package docs (API, auth, seed scripts)
+- [front-end/.env.example](front-end/.env.example) — Frontend env template (`BACKEND_URL` + `NEXT_PUBLIC_API_URL=http://localhost:3000`)
+- [back-end/.env.example](back-end/.env.example) — Backend env template
 - [crawler/.env.example](crawler/.env.example) — Legacy crawler environment template (deprecated)
 - [.github/workflows/pipeline.yml](.github/workflows/pipeline.yml) — Faculty pipeline CI configuration
-- [.github/workflows/scraper.yml](.github/workflows/scraper.yml) — Deprecated scraper workflow (disabled)
+- [.github/workflows/scraper.yml](.github/workflows/scraper.yml) — Deprecated scraper workflow (manual; exits with code 1)
+- `.understand-anything/knowledge-graph.json` — Generated architecture graph (optional local tooling)
