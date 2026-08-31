@@ -1,77 +1,333 @@
 # Dickinson Study Spaces
 
-Campus intelligence for Dickinson College — discover study spaces on an interactive Mapbox map, browse buildings with live open/closed status, and find faculty by department, office hours, and real-time availability.
+<p>
+  <img alt="Next.js 14" src="https://img.shields.io/badge/Next.js-14-black?logo=next.js&logoColor=white">
+  <img alt="React 18" src="https://img.shields.io/badge/React-18-149ECA?logo=react&logoColor=white">
+  <img alt="Node 22" src="https://img.shields.io/badge/Node.js-22.x-339933?logo=node.js&logoColor=white">
+  <img alt="Express" src="https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white">
+  <img alt="Supabase" src="https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?logo=supabase&logoColor=white">
+  <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
+  <img alt="Mapbox GL JS" src="https://img.shields.io/badge/Mapbox_GL_JS-v3-4264FB?logo=mapbox&logoColor=white">
+  <img alt="License: ISC" src="https://img.shields.io/badge/License-ISC-blue">
+</p>
 
-**Production:** [https://dson-study-spaces.vercel.app/home](https://dson-study-spaces.vercel.app/home)
+Campus intelligence for Dickinson College — an interactive Mapbox map of study spaces with live open/closed status, and a faculty directory with full-text search, temporal office hours, and real-time "in office now" detection.
 
+**Production:** [dson-study-spaces.vercel.app/home](https://dson-study-spaces.vercel.app/home)
 Allow browser location access for distance-based sorting and the best map experience.
 
-Deep system design (C4, ADRs, ingestion internals, security posture): **[ARCHITECTURE.md](ARCHITECTURE.md)**.
-
+Deep system design (C4 model, ADRs, ingestion internals, security posture, known gaps): **[ARCHITECTURE.md](ARCHITECTURE.md)**
 Package docs: **[front-end/README.md](front-end/README.md)** · **[back-end/README.md](back-end/README.md)**
+
+---
+
+## Contents
+
+- [Features](#features)
+- [System architecture](#system-architecture)
+- [Sequence diagrams](#sequence-diagrams)
+  - [Buildings — BFF proxy with secret injection](#1-buildings--bff-proxy-with-secret-injection)
+  - [Professors — public rewrite + full-text search](#2-professors--public-rewrite--full-text-search)
+  - [Live mode — dual evaluation path](#3-live-mode--dual-evaluation-path)
+  - [Faculty ingestion pipeline](#4-faculty-ingestion-pipeline)
+- [Data model](#data-model)
+- [Tech stack](#tech-stack)
+- [Repository layout](#repository-layout)
+- [Prerequisites](#prerequisites)
+- [Getting started](#getting-started)
+- [Environment reference](#environment-reference)
+- [Faculty pipeline](#faculty-pipeline)
+- [Scripts](#scripts)
+- [Deployment](#deployment)
+- [API reference](#api-reference)
+- [Design system](#design-system)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
 ## Features
 
 ### Study spaces
-- Interactive campus map (Mapbox GL JS)
+- Interactive campus map (Mapbox GL JS v3, WebGL globe projection, night light preset)
 - Building cards with hours, open/closed status, photos, and ratings
 - Sort by Closest / Furthest / Highest Rated / Name; filter by Open / Closed
 - Building directory with department → building mapping
 
 ### Faculty discovery
-- Full-text search across name, title, department, and bio (Postgres FTS)
+- Full-text search across name, title, department, and bio (Postgres FTS — weighted `tsvector`, `websearch_to_tsquery`, `ts_rank`)
 - Filter by department and building
 - Office hours via a temporal model (active rows only: `valid_until IS NULL`)
-- **Live mode** — highlights buildings where faculty are in office now (campus ET, refreshes every 60s)
+- **Live mode** — highlights buildings where faculty are in office right now (campus ET, refreshes every 60s)
 - **Time travel** — preview which buildings would be active at any hour of the day
 
 ### Data pipeline
 - Weekly faculty ingestion via GitHub Actions (`pipeline_worker/`)
-- Playwright discovery → aiohttp fetch → BeautifulSoup / FSM parse → Supabase upsert
+- Playwright discovery → aiohttp fetch (2 RPS rate cap) → BeautifulSoup / FSM parse → Supabase upsert
 - Identity-key upserts: `email` → `profile_url` → `fac_id` (never name-only)
-- RLS: public `SELECT`; writes require the service role
+- Temporal office-hours reconciliation: expire + insert on diff, no-op on fingerprint match
+- RLS: public `SELECT`; all writes require the service role
 
 ---
 
-## Architecture (overview)
+## System architecture
+
+Four containers: a Next.js frontend, an Express REST API, a Python ingestion pipeline, and a Supabase (PostgreSQL) database. The frontend is the only container users touch directly; the pipeline never talks to the API — it writes straight to the database with the service role key.
 
 ```mermaid
-flowchart LR
-  subgraph client [Browser]
-    Next["Next.js 14 App"]
+flowchart TB
+  subgraph actors ["External actors"]
+    Student["Student / Browser"]
+    FacultySite["Dickinson Faculty Directory"]
   end
 
-  subgraph api [Express API]
-    Buildings["GET /api/buildings"]
-    Professors["GET /api/professors*"]
+  subgraph platform ["Dickinson Study Spaces"]
+    NextApp["Next.js 14 Frontend\n(Vercel)"]
+    ExpressAPI["Express REST API\n(Vercel serverless)"]
+    Pipeline["pipeline_worker\n(GitHub Actions, weekly)"]
   end
 
-  subgraph data [Supabase]
-    DB[(Postgres + RLS)]
-    FTS["FTS + RPC"]
+  subgraph data ["Data layer"]
+    Supabase[("Supabase PostgreSQL\n+ RLS + FTS")]
   end
 
-  subgraph ci [GitHub Actions]
-    Pipeline["pipeline_worker"]
-  end
+  MapboxExt["Mapbox CDN"]
 
-  Next -->|"BFF Bearer secret"| Buildings
-  Next -->|"rewrite"| Professors
-  Buildings --> DB
-  Professors --> DB
-  Professors --> FTS
-  Pipeline -->|"service role"| DB
+  Student -->|"HTTPS — UI, map, search"| NextApp
+  NextApp -->|"BFF: Bearer INTERNAL_API_SECRET"| ExpressAPI
+  NextApp -->|"Rewrite: public GET"| ExpressAPI
+  ExpressAPI -->|"Service role — bypasses RLS"| Supabase
+  Pipeline -->|"Service role — direct upsert"| Supabase
+  Pipeline -->|"Playwright + aiohttp scrape"| FacultySite
+  Student -.->|"Map tiles — public token"| MapboxExt
+  NextApp -.-> MapboxExt
 ```
 
+**Trust boundaries**
+
+| Boundary | Nature |
+|---|---|
+| Browser ↔ Next.js | Public. `NEXT_PUBLIC_MAPBOX_TOKEN` is intentionally client-exposed. No session cookies or JWTs. |
+| Next.js ↔ Express (`/api/buildings`) | Server-to-server. `INTERNAL_API_SECRET` injected by the BFF route handler only, never sent to the browser. |
+| Browser ↔ Express (`/api/professors*`) | Transparent Next.js rewrite. No client secret required; RLS restricts writes. |
+| Pipeline ↔ Supabase | CI secrets only (`SUPABASE_SERVICE_ROLE_KEY`). No runtime coupling to Express. |
+
 | Layer | Stack |
-|-------|-------|
-| Frontend | Next.js 14 (App Router), React 18, Tailwind CSS, TanStack Query, Radix UI, Mapbox GL JS |
-| Backend | Node.js 22, Express, `@supabase/supabase-js` |
-| Database | Supabase (PostgreSQL), FTS, temporal office-hours schema, RLS |
-| Ingestion | Python 3.10+, Poetry, Playwright, Pydantic, BeautifulSoup, aiohttp |
-| Deployment | Vercel (frontend + API), GitHub Actions (pipeline) |
+|---|---|
+| Frontend | Next.js 14 (App Router), React 18, Tailwind CSS, TanStack Query v5, Radix UI, Mapbox GL JS v3 |
+| Backend | Node.js 22, Express 4, `@supabase/supabase-js`, helmet, cors, winston |
+| Database | Supabase (PostgreSQL) — full-text search, temporal office-hours schema, row-level security |
+| Ingestion | Python 3.10+, Poetry, Playwright, Pydantic v2, BeautifulSoup4, aiohttp, supabase-py v2 |
+| Deployment | Vercel (frontend + API as separate projects), GitHub Actions (weekly pipeline cron) |
+
+---
+
+## Sequence diagrams
+
+### 1. Buildings — BFF proxy with secret injection
+
+`GET /api/buildings` requires a shared secret. The frontend never exposes that secret to the browser: a Next.js Route Handler at `src/app/api/buildings/route.js` reads it server-side and injects it as a Bearer token before calling Express.
+
+```mermaid
+sequenceDiagram
+  participant Browser
+  participant Route as Next.js Route Handler<br/>(/api/buildings)
+  participant Express as Express (buildingsAuthMiddleware)
+  participant Data as data.json (19 buildings)
+  participant DB as Supabase (buildings table)
+
+  Browser->>Route: GET /api/buildings
+  Note over Browser,Route: Client may attach ?lat=&lng= for local<br/>Vincenty sort — Express ignores these params
+  Route->>Route: read INTERNAL_API_SECRET<br/>(alias: INTERNAL_API_KEY)
+  Route->>Express: fetch BACKEND_URL/api/buildings<br/>Authorization: Bearer <secret>
+  Express->>Express: validate Bearer header<br/>(missing secret → 500, mismatch → 401)
+  Express->>Data: loadStaticBuildings()
+  Express->>Express: compute open/closed (server local time)<br/>+ buildingSlug(name)
+  Express->>DB: SELECT id, name FROM buildings
+  Express->>Express: mergeSupabaseBuildingIds()<br/>(fallback id = slug on lookup miss)
+  Express-->>Route: 200 { data: Building[] }
+  Route-->>Browser: passthrough body<br/>Cache-Control: public, max-age=300
+```
+
+### 2. Professors — public rewrite + full-text search
+
+Professor endpoints are public reads — no secret injection, just a transparent Next.js rewrite (`next.config.mjs` → `/api/:path*`) straight to Express. Search queries are served by the `search_professors_fts` RPC (weighted `tsvector`, `websearch_to_tsquery`, `ts_rank`); listing without a query uses the Supabase query builder directly.
+
+```mermaid
+sequenceDiagram
+  participant Browser
+  participant Rewrite as Next.js Rewrite<br/>(/api/:path*)
+  participant Express as Express (/api/professors)
+  participant DB as Supabase PostgreSQL
+
+  Browser->>Rewrite: GET /api/professors?q=smith&department_id=...
+  Rewrite->>Express: proxy → BACKEND_URL/api/professors?...
+  alt q is present
+    Express->>DB: rpc(search_professors_fts,<br/>query, dept_id, bldg_id, lim, off)
+    DB->>DB: p.search_vector @@ websearch_to_tsquery('english', query)<br/>ORDER BY ts_rank(...) DESC
+    DB-->>Express: ranked rows + nested departments/office_hours JSONB
+  else no q
+    Express->>DB: professors.select('*, departments(name),<br/>professor_office_hours(*)')<br/>+ eq(department_id) + eq(building_id) + range(offset, limit)
+    DB-->>Express: rows
+  end
+  Express->>Express: mapProfessorOfficeHours()<br/>keep only valid_until IS NULL, map day_of_week → name
+  Express-->>Rewrite: 200 { data: Professor[] }<br/>Cache-Control: public, max-age=60
+  Rewrite-->>Browser: passthrough body
+```
+
+### 3. Live mode — dual evaluation path
+
+Live mode has two independent consumers of "is faculty in office right now," both computed against **campus time (`America/New_York`)** but through different code paths — one server-side for the map, one client-side for the professor list.
+
+```mermaid
+sequenceDiagram
+  participant UI as Home shell (React)
+  participant MapHook as useActiveNowBuildingIds
+  participant ListHook as useProfessors
+  participant Express as GET /api/professors/active-now
+  participant DB as Supabase
+  participant LiveMode as liveMode.js (client)
+
+  UI->>UI: user enables Live mode
+
+  par Map marker dimming (server-evaluated)
+    MapHook->>Express: GET /api/professors/active-now<br/>(enabled, refetchInterval: 60s)
+    Express->>DB: professor_office_hours.select(...)<br/>.is('valid_until', null)<br/>join professors!inner(building_id)
+    DB-->>Express: rows
+    Express->>Express: isOfficeHourActiveNow()<br/>per row, campus-ET day + minute-of-day
+    Express-->>MapHook: 200 { data: buildingId[] }<br/>Cache-Control: max-age=60
+    MapHook-->>UI: Set of buildingId → Map.js applyAllMarkerStyles()
+  and Professor list filter (client-evaluated)
+    ListHook->>Express: GET /api/professors (already fetched, staleTime 30s)
+    Express-->>ListHook: professors + professor_office_hours
+    UI->>LiveMode: isProfessorInOffice(professor)
+    LiveMode->>LiveMode: compare campus day/time vs<br/>each office-hours row
+    LiveMode-->>UI: boolean → filter visible list
+  end
+```
+
+> Both paths use `America/New_York`, but they are two separate evaluations of the same clock against two separately fetched datasets — see [ARCHITECTURE.md § Known Gaps](ARCHITECTURE.md#10-known-gaps-and-technical-debt) for the staleness tradeoff this implies.
+
+### 4. Faculty ingestion pipeline
+
+`pipeline_worker` is the **sole** scheduled writer for faculty data, run weekly by GitHub Actions directly against Supabase with the service role key — it never goes through the Express API. The legacy Node crawler (`crawler/`) and `POST /api/professors/sync` are deprecated / kept only for ad-hoc use.
+
+```mermaid
+sequenceDiagram
+  participant Cron as GitHub Actions<br/>(Sun 02:00 UTC / workflow_dispatch)
+  participant Discover as Stage 1 — Playwright discovery
+  participant Fetch as Stage 2 — aiohttp fetch
+  participant Extract as Stage 3 — BeautifulSoup + FSM
+  participant Persist as Stage 4 — Supabase upsert
+  participant DB as Supabase PostgreSQL
+
+  Cron->>Discover: run_orchestrator()
+  Discover->>Discover: 48 seed URLs, 5 concurrent pages/batch<br/>3 retry attempts w/ backoff
+  Discover-->>Fetch: dict[profile_url → department_hint]
+
+  Fetch->>Fetch: extract fac= query param<br/>batches of 10, sleep(batch/2.0) → 2 RPS cap
+  Fetch-->>Extract: (fac_id, html | None) tuples
+
+  Extract->>Extract: ProfileExtractor (BeautifulSoup)<br/>→ OfficeHoursFSM (regex tokenize)<br/>→ FacultyProfile (Pydantic)
+  Extract-->>Persist: validated FacultyProfile objects
+
+  Persist->>DB: departments upsert (on_conflict=name)
+  Persist->>Persist: resolve building: alias map →<br/>canonical name → dept.primary_building_id
+  Persist->>DB: professors upsert<br/>priority: email → profile_url → fac_id
+  Persist->>DB: SELECT active office_hours<br/>(valid_until IS NULL)
+  alt fingerprint unchanged
+    Persist->>Persist: no-op (idempotent re-run)
+  else fingerprint changed
+    Persist->>DB: UPDATE valid_until = NOW() (expire old rows)
+    Persist->>DB: INSERT new rows (term_identifier = current term)
+    opt insert fails
+      Persist->>DB: compensating rollback:<br/>restore valid_until = NULL
+    end
+  end
+```
+
+Full stage-by-stage module reference, retry semantics, and the fingerprint definition: [ARCHITECTURE.md § 4](ARCHITECTURE.md#4-data-ingestion-flow).
+
+---
+
+## Data model
+
+Base tables (`professors`, `departments`, `buildings`) must pre-exist in Supabase — repo migrations extend them, they do not create them from scratch.
+
+```mermaid
+erDiagram
+  buildings {
+    uuid id PK
+    text name UK
+    float latitude
+    float longitude
+    text address
+    jsonb hours
+    text image_url
+  }
+
+  departments {
+    uuid id PK
+    text name UK
+    uuid primary_building_id FK
+  }
+
+  professors {
+    uuid id PK
+    text name
+    text email UK
+    text profile_url UK
+    text fac_id UK
+    uuid department_id FK
+    uuid building_id FK
+    varchar title
+    text bio
+    jsonb publications
+    boolean is_active
+    timestamptz first_seen_at
+    tsvector search_vector
+  }
+
+  professor_office_hours {
+    uuid id PK
+    uuid professor_id FK
+    varchar term_identifier
+    smallint day_of_week
+    time start_time
+    time end_time
+    boolean is_by_appointment
+    varchar location
+    timestamptz valid_from
+    timestamptz valid_until
+    timestamptz created_at
+  }
+
+  buildings ||--o{ professors : "building_id"
+  buildings ||--o{ departments : "primary_building_id"
+  departments ||--o{ professors : "department_id"
+  professors ||--o{ professor_office_hours : "professor_id CASCADE"
+```
+
+`professor_office_hours` is temporal: active rows have `valid_until IS NULL`; every read path (API, FTS RPC, live mode) filters on that predicate. Migrations, RLS policies, and the full ER rationale: [ARCHITECTURE.md § 6.4](ARCHITECTURE.md#64-database--supabase--postgresql).
+
+---
+
+## Tech stack
+
+| Area | Technology |
+|---|---|
+| Frontend framework | Next.js 14 (App Router), React 18 |
+| Styling | Tailwind CSS, Radix UI primitives |
+| Data fetching / cache | TanStack Query v5 |
+| Map | Mapbox GL JS v3 (WebGL, globe projection) |
+| Backend framework | Node.js 22, Express 4 |
+| Backend hardening | helmet, cors (origin allowlist), winston logging |
+| Database client | `@supabase/supabase-js` v2 (HTTP transport, service role) |
+| Database | Supabase (PostgreSQL) — RLS, GIN-indexed full-text search |
+| Ingestion runtime | Python 3.10+ managed by Poetry |
+| Ingestion libraries | Playwright (discovery), aiohttp (fetch), BeautifulSoup4 (parse), Pydantic v2 (contracts), supabase-py v2 (writes) |
+| CI/CD | GitHub Actions (weekly pipeline cron + `workflow_dispatch`) |
+| Hosting | Vercel — frontend and backend as two separate projects |
 
 ---
 
@@ -265,7 +521,7 @@ vercel --prod
 
 ---
 
-## API overview
+## API reference
 
 | Method | Path | Auth | Cache | Description |
 |--------|------|------|-------|-------------|
@@ -288,7 +544,7 @@ Client may send `lat`/`lng` on buildings fetch for client-side distance sort; th
 - **Controls** — solid utility surfaces for readability; glassmorphic content panels on the map shell
 - **Components** — Radix UI primitives + Tailwind in `front-end/src/ui/`
 
-Open/closed and live-mode evaluation use campus timezone `America/New_York` on the primary UI paths. See [ARCHITECTURE.md](ARCHITECTURE.md) § timezone notes for known inconsistencies in fetch enrichment and the Express buildings status field.
+Open/closed and live-mode evaluation use campus timezone `America/New_York` on the primary UI paths. See [ARCHITECTURE.md § Live mode — dual evaluation path](ARCHITECTURE.md#live-mode--dual-evaluation-path) for known inconsistencies in fetch enrichment and the Express buildings status field.
 
 ---
 
